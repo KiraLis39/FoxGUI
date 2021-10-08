@@ -25,9 +25,9 @@ public class FoxFontBuilder {
 		
 	static {
 		fArr.add(0, "Comic Sans MS");			fArr.add(1, "Monotype Corsiva");
-		fArr.add(2, "bahnschrift");				fArr.add(3, "Candara");
-		fArr.add(4, "Harlow Solid Italic");		fArr.add(5, "Corbel");
-		fArr.add(6, "Georgia");					fArr.add(7, "Arial");
+		fArr.add(2, "bahnschrift");			fArr.add(3, "Candara");
+		fArr.add(4, "Harlow Solid Italic");	fArr.add(5, "Corbel");
+		fArr.add(6, "Georgia");				fArr.add(7, "Arial");
 		fArr.add(8, "Arial Narrow");			fArr.add(9, "Segoe Script");
 		fArr.add(10, "Cambria");				fArr.add(11, "Constantia");
 		fArr.add(12, "Consolas");				fArr.add(13, "Papyrus");

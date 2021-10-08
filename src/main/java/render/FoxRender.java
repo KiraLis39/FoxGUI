@@ -3,7 +3,6 @@ package render;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
-
 public class FoxRender {
 //	image.getScaledInstance(1024, 768, 2);
 //	g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.0f));

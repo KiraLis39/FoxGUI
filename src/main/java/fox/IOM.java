@@ -15,17 +15,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 
-
 public class IOM {
-	public static enum HEADERS {REGISTRY, CONFIG, USER_SAVE, LAST_USER, USER_LIST, SECURE, TEMP} // несколько готовых примеров (можно задавать и свои, конечно)
+	public enum HEADERS {REGISTRY, CONFIG, USER_SAVE, LAST_USER, USER_LIST, SECURE, TEMP} // несколько готовых примеров (можно задавать свои)
 	
-	private final static ArrayList<Properties> PropsArray = new ArrayList<Properties>(HEADERS.values().length); // массив активных хранилищ
-	private final static Charset codec = StandardCharsets.UTF_8;
-	
+	private final static ArrayList<Properties> propsArray = new ArrayList<>(HEADERS.values().length); // массив активных хранилищ
 	private static Boolean consoleOut = false; // трассировка в лог
 	private static String DEFAULT_EMPTY_STRING = "NA"; // чем будет значение при его отсутствии\создании без указания значения
-	
-	
+
 	private IOM() {}
 	
 	
@@ -34,10 +30,10 @@ public class IOM {
 		String name = propertiName.toString();
 
 		// проверяем не идет ли повторная попытка создания такого же проперчеса...
-		for (int i = 0; i < PropsArray.size(); i++) {
-			if (PropsArray.get(i).containsKey("propName") && PropsArray.get(i).getProperty("propName").equals(name)) {
+		for (int i = 0; i < propsArray.size(); i++) {
+			if (propsArray.get(i).containsKey("propName") && propsArray.get(i).getProperty("propName").equals(name)) {
 				log("Такой экземпляр уже есть! Перезапись...");
-				PropsArray.remove(i);
+				propsArray.remove(i);
 			}
 		}
 
@@ -45,14 +41,14 @@ public class IOM {
 		Properties tmp = new Properties(4);
 
 		// проверяем есть ли файл для чтения\записи...
-		if (testFileExist(PropertiFile)) {
-			try (InputStreamReader ISR = new InputStreamReader(new FileInputStream(PropertiFile), codec)) {
+		if (isFileExist(PropertiFile)) {
+			try (InputStreamReader ISR = new InputStreamReader(new FileInputStream(PropertiFile), StandardCharsets.UTF_8)) {
 				tmp.load(ISR);
 	
 				tmp.setProperty("propName", name);
 				tmp.setProperty("propFile", PropertiFile.getPath());
-	
-				PropsArray.add(tmp);
+
+				propsArray.add(tmp);
 	
 				save(name);
 				log("Cоздание нового потока: " + name + " завершено.");
@@ -67,12 +63,13 @@ public class IOM {
 		if (name.isEmpty()) {showWithoutNameErr(name);
 		} else if (parameter.equals("")) {showWithoutKeyErr(parameter);
 		} else {
-			for (int i = 0; i < PropsArray.size(); i++) {
-				if (PropsArray.get(i).containsKey("propName")) {
-					if (PropsArray.get(i).getProperty("propName").equals(name)) {
-						log("Запись в проперчес " + name + " параметра " + String.valueOf(value) + "' (" + value.getClass().getTypeName() + ").");
-						if (PropsArray.get(i).containsKey(parameter)) {PropsArray.get(i).setProperty(parameter, String.valueOf(value));
-						} else {PropsArray.get(i).putIfAbsent(parameter, String.valueOf(value));}
+			for (int i = 0; i < propsArray.size(); i++) {
+				Properties p = propsArray.get(i);
+				if (p.containsKey("propName")) {
+					if (p.getProperty("propName").equals(name)) {
+						log("Запись в проперчес " + name + " параметра " + value + "' (" + value.getClass().getTypeName() + ").");
+						if (p.containsKey(parameter)) {p.setProperty(parameter, String.valueOf(value));
+						} else {p.putIfAbsent(parameter, String.valueOf(value));}
 						return;
 					}
 				}
@@ -89,15 +86,16 @@ public class IOM {
 		if (name.isEmpty() || name.isBlank()) {showWithoutNameErr(name);
 		} else if (parameter.isEmpty() || parameter.isBlank()) {showWithoutKeyErr(parameter);
 		} else {
-			for (int i = 0; i < PropsArray.size(); i++) {
-				if (!PropsArray.get(i).containsKey("propName")) {
-					log("Каким-то образом проперчес " + PropsArray.get(i).toString() + " не имеет ключа с именем.");
+			for (int i = 0; i < propsArray.size(); i++) {
+				Properties p = propsArray.get(i);
+				if (!p.containsKey("propName")) {
+					log("Каким-то образом проперчес " + p + " не имеет ключа с именем.");
 					continue;
 				}
 				
-				if (PropsArray.get(i).getProperty("propName").equals(name)) {
+				if (p.getProperty("propName").equals(name)) {
 					// если хранилище имеет такое значение, и это не заглушка - просто выходим:
-					if (PropsArray.get(i).containsKey(parameter) && !PropsArray.get(i).get(parameter).equals(DEFAULT_EMPTY_STRING)) {return;
+					if (p.containsKey(parameter) && !p.get(parameter).equals(DEFAULT_EMPTY_STRING)) {return;
 					} else {set(propertiName, existKey, defaultValue);} // иначе устанавливаем новое значение.
 					return;
 				}
@@ -116,11 +114,11 @@ public class IOM {
 		
 		try {
 			int ind = getPropIndex(propertiName.toString());
-			log("Конфигурация найдена. Чтение флага " + key.toString() + "...");				
-			PropsArray.get(ind).putIfAbsent(key.toString(), "false");
+			log("Конфигурация найдена. Чтение флага " + key.toString() + "...");
+			propsArray.get(ind).putIfAbsent(key.toString(), "false");
 			
-			log("Возврат флага " + PropsArray.get(ind).getProperty(key.toString()) + ".");				
-			return Boolean.valueOf(PropsArray.get(ind).getProperty(key.toString()));
+			log("Возврат флага " + propsArray.get(ind).getProperty(key.toString()) + ".");
+			return Boolean.valueOf(propsArray.get(ind).getProperty(key.toString()));
 		} catch (Exception e) {
 			e.printStackTrace();
 			log("Параметр '" + key + "' не является типом Boolean. (" + key.getClass() + ")");
@@ -138,13 +136,13 @@ public class IOM {
 		try {
 			ind = getPropIndex(propertiName.toString());
 			if (!existKey(propertiName.toString(), key.toString())) {
-				PropsArray.get(ind).putIfAbsent(key.toString(), "-1D");
+				propsArray.get(ind).putIfAbsent(key.toString(), "-1D");
 				save(propertiName.toString());
 			}
-			return Double.parseDouble(PropsArray.get(ind).getProperty(key.toString()));
+			return Double.parseDouble(propsArray.get(ind).getProperty(key.toString()));
 		} catch (Exception e) {
 			e.printStackTrace();
-			log("Параметр '" + key + "' не является типом Double. (" + key.getClass() + ")" + (ind == -1 ? "" : " (value: " + PropsArray.get(ind).getProperty(key.toString()) + ")."));
+			log("Параметр '" + key + "' не является типом Double. (" + key.getClass() + ")" + (ind == -1 ? "" : " (value: " + propsArray.get(ind).getProperty(key.toString()) + ")."));
 		}
 		
 		return null;
@@ -158,10 +156,10 @@ public class IOM {
 		
 		int ind = getPropIndex(propertiName.toString());
 		if (!existKey(propertiName.toString(), key.toString())) {
-			PropsArray.get(ind).putIfAbsent(key.toString(), DEFAULT_EMPTY_STRING);
+			propsArray.get(ind).putIfAbsent(key.toString(), DEFAULT_EMPTY_STRING);
 			save(propertiName.toString());
 		}
-		return PropsArray.get(ind).getProperty(key.toString());
+		return propsArray.get(ind).getProperty(key.toString());
 	}
 	// пытаемся взять инт из хранилища:
 	public synchronized static Integer getInt(Object propertiName, Object key) {
@@ -172,7 +170,7 @@ public class IOM {
 		
 		try {
 			int ind = getPropIndex(propertiName.toString());
-			Properties tmp = PropsArray.get(ind);
+			Properties tmp = propsArray.get(ind);
 			if (!existKey(propertiName.toString(), key.toString())) {
 				tmp.putIfAbsent(key.toString(), "-1");
 				save(propertiName.toString());
@@ -191,10 +189,10 @@ public class IOM {
 		if (propertiName.toString().isEmpty() || propertiName.toString().isBlank()) {showWithoutNameErr(propertiName.toString());
 		} else {
 			int propCount = -1;
-			for (int i = 0; i < PropsArray.size(); i++) {
-				if (PropsArray.get(i).containsKey("propName")) {
-					if (PropsArray.get(i).getProperty("propName").equals(propertiName.toString())) {
-						log("Удаление из проперчес " + propertiName.toString() + " параметра " + key + "'.");
+			for (int i = 0; i < propsArray.size(); i++) {
+				if (propsArray.get(i).containsKey("propName")) {
+					if (propsArray.get(i).getProperty("propName").equals(propertiName.toString())) {
+						log("Удаление из проперчес " + propertiName + " параметра " + key + "'.");
 						propCount = i;
 						break;
 					}
@@ -203,16 +201,16 @@ public class IOM {
 
 			if (propCount == -1) {showNotExistsErr(propertiName.toString());
 			} else {
-				if (PropsArray.get(propCount).containsKey(key)) {PropsArray.get(propCount).remove(key);}
+				if (propsArray.get(propCount).containsKey(key)) {propsArray.get(propCount).remove(key);}
 			}
 		}
 	}
 	
 	// сохранить конкретное хранилище на диск:
 	public synchronized static Boolean save(Object propertiName) {
-		for (Properties properties : PropsArray) {
+		for (Properties properties : propsArray) {
 			if (properties.get("propName").equals(propertiName.toString())) {
-				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(new File(properties.getProperty("propFile")), false), codec)) {
+				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(new File(properties.getProperty("propFile")), false), StandardCharsets.UTF_8)) {
 					properties.store(osw, "IOM_SAVE");
 					log("Сохранение " + properties.getProperty("propFile") + " завершено!");
 					return true;
@@ -230,15 +228,15 @@ public class IOM {
 	// сохранить все активные хранилища на диск:
 	public synchronized static void saveAll() {
 		log("Каскадное сохранение всех файлов...");
-		for (Properties properties : PropsArray) {save(properties.get("propName"));}
+		for (Properties properties : propsArray) {save(properties.get("propName"));}
 	}
 
 	// загрузить конкретное хранилище из файла на диске:
 	public synchronized static Boolean load(Object propertiName) {
-		for (Properties properties : PropsArray) {
+		for (Properties properties : propsArray) {
 			if (properties.get("propName").equals(propertiName.toString())) {
-				try (InputStreamReader ISR = new InputStreamReader(new FileInputStream(new File(properties.getProperty("propFile"))), codec)) {
-					log("Загрузка файла " + propertiName.toString() + " в поток " + properties.getProperty("propName"));
+				try (InputStreamReader ISR = new InputStreamReader(new FileInputStream(properties.getProperty("propFile")), StandardCharsets.UTF_8)) {
+					log("Загрузка файла " + propertiName + " в поток " + properties.getProperty("propName"));
 					properties.load(ISR);
 					return true;
 				} catch (IOException e) {
@@ -254,7 +252,7 @@ public class IOM {
 	// загрузить все хранилища из файлов на диске:
 	public synchronized static void loadAll() {
 		log("Каскадная загрузка всех файлов (перезагрузка проперчесов)...");
-		for (Properties properties : PropsArray) {load(properties);}
+		for (Properties properties : propsArray) {load(properties);}
 	}
 
 	
@@ -265,15 +263,15 @@ public class IOM {
 	
 	// существует ли активное хранилище:
 	public synchronized static Boolean existProp(String propertiName) {
-		for (Properties properti : PropsArray) {
-			if (properti.get("propName").equals(propertiName.toString())) {return true;}
+		for (Properties properti : propsArray) {
+			if (properti.get("propName").equals(propertiName)) {return true;}
 		}
 		return false;
 	}
 	// существует ли в хранилище такой ключ:
 	public synchronized static Boolean existKey(String propertiName, String key) {
-		for (Properties properties : PropsArray) {
-			if (properties.get("propName").equals(propertiName.toString())) {
+		for (Properties properties : propsArray) {
+			if (properties.get("propName").equals(propertiName)) {
 				if (properties.containsKey(key)) {return true;}
 			}
 		}
@@ -282,20 +280,20 @@ public class IOM {
 	}
 	// получить индекс хранилища с таким именем:
 	public synchronized static int getPropIndex(String propertiName) {
-		for (Properties properti : PropsArray) {
-			if (properti.get("propName").equals(propertiName)) {return PropsArray.indexOf(properti);}
+		for (Properties properti : propsArray) {
+			if (properti.get("propName").equals(propertiName)) {return propsArray.indexOf(properti);}
 		}
 		return -1;
 	}
 	// получить список имен активных хранилищ:
 	public synchronized static String getPropsNames() {
-		ArrayList<String> propsNames = new ArrayList<String>(PropsArray.size());
-		for (Properties properties : PropsArray) {propsNames.add(properties.getProperty("propName"));}
+		ArrayList<String> propsNames = new ArrayList<String>(propsArray.size());
+		for (Properties properties : propsArray) {propsNames.add(properties.getProperty("propName"));}
 		return Arrays.toString(propsNames.toArray());
 	}
 	
 	// проверка директорий и файлов хранилищ:
-	private static boolean testFileExist(File file) {
+	private static boolean isFileExist(File file) {
 		Path parentDir = Paths.get(file.getParentFile().toURI());
 		while (Files.notExists(parentDir)) {
 			log("Попытка создания директории '" + parentDir + "'...");

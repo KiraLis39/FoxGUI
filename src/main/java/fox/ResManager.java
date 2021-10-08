@@ -24,7 +24,7 @@ import render.FoxRender;
 
 public class ResManager {
 	private final static Map<String, BufferedImage> imageBuffer = Collections.synchronizedMap(new LinkedHashMap<String, BufferedImage> ());
-	private final static Map<String, File> resourseLinksMap = Collections.synchronizedMap(new LinkedHashMap<String, File> ());
+	private final static Map<String, File> linksMap = Collections.synchronizedMap(new LinkedHashMap<String, File> ());
 	private final static Map<String, byte[]> cash = Collections.synchronizedMap(new LinkedHashMap<String, byte[]> ());
 	
 	private final static long MAX_MEMORY = Runtime.getRuntime().maxMemory() - 1L;
@@ -99,8 +99,8 @@ public class ResManager {
 		if (file instanceof BufferedImage) {
 			imageBuffer.put(name, (BufferedImage) file);
 			return;
-		} else if (file instanceof File) {		
-			resourseLinksMap.put(name, (File) file);
+		} else if (file instanceof File) {
+			linksMap.put(name, (File) file);
 			if (!isImage) {cash.put(name, Files.readAllBytes(((File) file).toPath()));
 			} else {imageBuffer.put(name, ImageIO.read((File) file));}
 		}
@@ -112,7 +112,7 @@ public class ResManager {
 		String name = String.valueOf(index);
 		if (cash.containsKey(name)) {cash.remove(name);}
 		if (imageBuffer.containsKey(name)) {imageBuffer.remove(name);}
-		if (resourseLinksMap.containsKey(name)) {resourseLinksMap.remove(name);}
+		if (linksMap.containsKey(name)) {linksMap.remove(name);}
 	}
 
 	// забираем картинку:
@@ -139,7 +139,7 @@ public class ResManager {
 						
 			if (cash.containsKey(name)) {buildImageByCash(name, transparensy, gconf);
 			} else {
-				if (resourseLinksMap.containsKey(name)) {buildImageByLink(name, transparensy, gconf);
+				if (linksMap.containsKey(name)) {buildImageByLink(name, transparensy, gconf);
 				} else {
 					log("BufferedImage '" + name + "' not exist into ResourceManager!");
 					return null;
@@ -154,19 +154,19 @@ public class ResManager {
 	private static void buildImageByLink(String name, boolean transparensy, GraphicsConfiguration gconf) {
 		try {
 			BufferedImage tmp = gconf.createCompatibleImage(
-					ImageIO.read(resourseLinksMap.get(name)).getWidth(), 
-					ImageIO.read(resourseLinksMap.get(name)).getHeight(),
+					ImageIO.read(linksMap.get(name)).getWidth(),
+					ImageIO.read(linksMap.get(name)).getHeight(),
 					HQ
 			);
 
 			if (transparensy) {
 				Graphics2D g2D = (Graphics2D) tmp.getGraphics();
 				FoxRender.setHQRender(g2D);
-				g2D.drawImage(ImageIO.read(resourseLinksMap.get(name)), 0, 0, null);
+				g2D.drawImage(ImageIO.read(linksMap.get(name)), 0, 0, null);
 				g2D.dispose();
 				
 				imageBuffer.put(name, tmp);
-			} else {imageBuffer.put(name, ImageIO.read(resourseLinksMap.get(name)));}
+			} else {imageBuffer.put(name, ImageIO.read(linksMap.get(name)));}
 		} catch (Exception e) {
 			log("Operation buildImageByLink has failed!");
 			e.printStackTrace();
@@ -205,8 +205,8 @@ public class ResManager {
 	public synchronized static byte[] getBytes(Object index) {
 		String name = String.valueOf(index);
 		if (cash.containsKey(name)) {return cash.get(name);
-		} else if (resourseLinksMap.containsKey(name)) {
-			try {add(name, resourseLinksMap.get(name), true);
+		} else if (linksMap.containsKey(name)) {
+			try {add(name, linksMap.get(name), true);
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
@@ -221,9 +221,9 @@ public class ResManager {
 	// получить ссылку на ресурс:
 	public synchronized static File getFileLink(Object index) {
 		String name = String.valueOf(index);
-		try {return resourseLinksMap.get(name);
+		try {return linksMap.get(name);
 		} catch (Exception e) {
-			if (resourseLinksMap.isEmpty()) {log("The LinksMap was cleaned already. It was You?.. (" + e.getMessage() + ")");
+			if (linksMap.isEmpty()) {log("The LinksMap was cleaned already. It was You?.. (" + e.getMessage() + ")");
 			} else {log("The link of file '" + name + "' dont exist into LinksMap. Sorry! (" + e.getMessage() + ")");}
 		}
 		
@@ -231,21 +231,21 @@ public class ResManager {
 	}
 	
 	
-	public synchronized static Set<String> getLinksKeys() {return resourseLinksMap.keySet();}
-	public synchronized static Collection<File> getLinksValues() {return resourseLinksMap.values();}
-	public synchronized static Set<Entry<String, File>> getLinksEntrySet() {return resourseLinksMap.entrySet();}	
+	public synchronized static Set<String> getLinksKeys() {return linksMap.keySet();}
+	public synchronized static Collection<File> getLinksValues() {return linksMap.values();}
+	public synchronized static Set<Entry<String, File>> getLinksEntrySet() {return linksMap.entrySet();}
 
 	
 	public synchronized static void clearImages() {imageBuffer.clear();}
 	public synchronized static void clearAll() {
 		cash.clear();
 		imageBuffer.clear();
-		resourseLinksMap.clear();
+		linksMap.clear();
 	}
 	
 	public synchronized static int getCashSize() {return cash.size();}
 	public synchronized static int getImagesSize() {return imageBuffer.size();}
-	public synchronized static int getLinksSize() {return resourseLinksMap.size();}
+	public synchronized static int getLinksSize() {return linksMap.size();}
 	
 	public synchronized static long getCashVolume() {
 		long bytesMapSize = 0L;		

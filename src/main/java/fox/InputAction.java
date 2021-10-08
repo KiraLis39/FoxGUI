@@ -10,7 +10,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
-
 public class InputAction {
 	static Map<String, JComponent> compMap = new LinkedHashMap<String, JComponent>();
 
@@ -21,8 +20,8 @@ public class InputAction {
 	
 	public static void set(String name, String commandName, int key, int mod, AbstractAction action) {
 		if (compMap.containsKey(name)) {
-			((JComponent) compMap.get(name)).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key, mod), commandName);
-			((JComponent) compMap.get(name)).getActionMap().put(commandName, action);
+			(compMap.get(name)).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key, mod), commandName);
+			(compMap.get(name)).getActionMap().put(commandName, action);
 			return;
 		}
 		

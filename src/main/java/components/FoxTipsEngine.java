@@ -1,5 +1,7 @@
 package components;
 
+import render.FoxRender;
+
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -33,7 +35,6 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 
-@SuppressWarnings("serial")
 public class FoxTipsEngine {
 	public enum TYPE {INPUT, INFO}
 	
@@ -86,16 +87,14 @@ public class FoxTipsEngine {
 					public void componentShown(ComponentEvent e) {
 						if (timer != null && timer.isRunning()) {timer.stop();}
 						opacity = 0.1f;
-						timer = new Timer(33, new ActionListener() {
-							public void actionPerformed(ActionEvent e) {
-								opacity += 0.1f;
-								if (opacity >= MAX_OPAQUE ) {
-									opacity = MAX_OPAQUE;
-									timer.stop();
-								}
-
-								repaint();
+						timer = new Timer(33, e1 -> {
+							opacity += 0.1f;
+							if (opacity >= MAX_OPAQUE ) {
+								opacity = MAX_OPAQUE;
+								timer.stop();
 							}
+
+							repaint();
 						});
 
 						timer.start();
@@ -106,7 +105,7 @@ public class FoxTipsEngine {
 					@Override
 					public void paint(Graphics g) {
 						Graphics2D g2d = (Graphics2D) g;
-						render(g2d);
+						FoxRender.setMedRender(g2d);
 						g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
 
 						GeneralPath gp = buildForm();
@@ -203,7 +202,7 @@ public class FoxTipsEngine {
 									@Override
 									public void paint(Graphics g) {
 										Graphics2D g2d = (Graphics2D) g;
-										render(g2d);
+										FoxRender.setMedRender(g2d);
 										g2d.setStroke(new BasicStroke(2f));
 										g2d.setPaint(mouseOver ? over : out);
 										g2d.drawLine(1, 0, getWidth() - 2, 12);
@@ -253,25 +252,15 @@ public class FoxTipsEngine {
 		if (timer != null && timer.isRunning()) {timer.stop();}
 		
 		opacity = 1f;
-		timer = new Timer(1000 / 24, new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				opacity -= 0.1f;
-				if (opacity <= 0.1f) {
-					opacity = 0.1f;
-					dialog.setVisible(false);
-					timer.stop();
-				}
-				contentPanel.repaint();
+		timer = new Timer(1000 / 24, e -> {
+			opacity -= 0.1f;
+			if (opacity <= 0.1f) {
+				opacity = 0.1f;
+				dialog.setVisible(false);
+				timer.stop();
 			}
+			contentPanel.repaint();
 		});
 		timer.start();
-	}
-
-	private void render(Graphics2D g2D) {
-		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2D.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
-		g2D.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-		g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_DEFAULT);
 	}
 }

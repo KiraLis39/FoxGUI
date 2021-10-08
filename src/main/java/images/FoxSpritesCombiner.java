@@ -1,11 +1,10 @@
 package images;
 
+import render.FoxRender;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 
 public class FoxSpritesCombiner {
 	private final static Map<String, BufferedImage[]> sptitesMap = new LinkedHashMap<String, BufferedImage[]>();
@@ -37,7 +36,6 @@ public class FoxSpritesCombiner {
 		int spriteWidth = image.getWidth() / w;
 		int spriteHeight = image.getHeight() / h;
 		result = new BufferedImage[w * h];
-//		Out.Print("fox.games.FoxSpritesCombiner.loadAndCut():", 0, "Нарезка " + (w * h) + " спрайтов...");
 		
 		int i = 0;
 		Graphics2D g2D = null;
@@ -46,26 +44,20 @@ public class FoxSpritesCombiner {
 			for (int x = 0; x < w; x++) {
 				result[i] = new BufferedImage(spriteWidth, spriteHeight, BufferedImage.TYPE_INT_ARGB);
 				g2D = result[i].createGraphics();
-//				setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.0f));
-				render(g2D);
+				FoxRender.setHQRender(g2D);
 				
 				g2D.drawImage(image, 
 						0, 	0, 
-						result[i].getWidth(), 	result[i].getHeight(), 
-
-						spriteWidth * x, 			spriteHeight * y, 
-						spriteWidth * (x + 1), 	spriteHeight * (y + 1), 
-						
+						result[i].getWidth(), result[i].getHeight(),
+						spriteWidth * x,spriteHeight * y,
+						spriteWidth * (x + 1),spriteHeight * (y + 1),
 						null);
 				i++;
 			}
 		}
 		
 		g2D.dispose();
-		
-//		Out.Print("fox.games.FoxSpritesCombiner.loadAndCut():", 0, "Спрайтов готово: " + result.length);
-//		Out.Print("fox.games.FoxSpritesCombiner.loadAndCut():", 0, "Размер спрайта: " + result[0].getWidth() + "x" + result[0].getHeight() + "px");
-		
+
 		return result;
 	}
 
@@ -85,15 +77,7 @@ public class FoxSpritesCombiner {
 		
 		sptitesMap.remove(spriteName);
 	}
-	
-	private static void render(Graphics2D g2D) {
-		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2D.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
-		g2D.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-		g2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-		g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-	}
-	
+
 	private static void log(String message) {
 		System.out.println(FoxSpritesCombiner.class.getName() + " : " + message);
 	}
