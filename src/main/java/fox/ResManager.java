@@ -21,22 +21,17 @@ import javax.imageio.ImageIO;
 
 import render.FoxRender;
 
-
 public class ResManager {
-	private final static Map<String, BufferedImage> imageBuffer = Collections.synchronizedMap(new LinkedHashMap<String, BufferedImage> ());
-	private final static Map<String, File> linksMap = Collections.synchronizedMap(new LinkedHashMap<String, File> ());
-	private final static Map<String, byte[]> cash = Collections.synchronizedMap(new LinkedHashMap<String, byte[]> ());
+	private final static Map<String, BufferedImage> imageBuffer = Collections.synchronizedMap(new LinkedHashMap<> ());
+	private final static Map<String, File> linksMap = Collections.synchronizedMap(new LinkedHashMap<> ());
+	private final static Map<String, byte[]> cash = Collections.synchronizedMap(new LinkedHashMap<> ());
 	
 	private final static long MAX_MEMORY = Runtime.getRuntime().maxMemory() - 1L;
 	private static long USED_MEMORY, MAX_LOADING;
-	
 	private static int HQ = 0, MIN_ELEMENTS_CASH_COUNT_TO_CLEARING = 128, MIN_ELEMENTS_BIMAGE_COUNT_TO_CLEARING = 64;
-	
 	private static float memGCTrigger = 0.75f;
-	
 	private static boolean logEnable = true;
-	
-	
+
 	private ResManager() {}
 	
 	

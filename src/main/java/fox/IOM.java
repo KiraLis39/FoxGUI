@@ -25,15 +25,15 @@ public class IOM {
 	private IOM() {}
 	
 	
-	// подключение нового хранилища:
+	// подключение хранилища:
 	public synchronized static void add(Object propertiName, File PropertiFile) {
 		String name = propertiName.toString();
 
 		// проверяем не идет ли повторная попытка создания такого же проперчеса...
-		for (int i = 0; i < propsArray.size(); i++) {
-			if (propsArray.get(i).containsKey("propName") && propsArray.get(i).getProperty("propName").equals(name)) {
+		for (Properties p : propsArray) {
+			if (p.containsKey("propName") && p.getProperty("propName").equals(name)) {
 				log("Такой экземпляр уже есть! Перезапись...");
-				propsArray.remove(i);
+				propsArray.remove(propsArray.indexOf(p));
 			}
 		}
 
@@ -49,10 +49,12 @@ public class IOM {
 				tmp.setProperty("propFile", PropertiFile.getPath());
 
 				propsArray.add(tmp);
-	
-				save(name);
+				save(tmp);
 				log("Cоздание нового потока: " + name + " завершено.");
-			} catch (Exception ex) {log("Проблема при чтении файла последнего пользователя lastUserFile!");}
+			} catch (Exception ex) {
+				log("Проблема при чтении '" + PropertiFile + "': " + ex.getMessage());
+				ex.printStackTrace();
+			}
 		}
 	}
 	
@@ -60,14 +62,13 @@ public class IOM {
 	public synchronized static void set(Object propertiName, Object key, Object value) {
 		String name = propertiName.toString(), parameter = key.toString();
 		
-		if (name.isEmpty()) {showWithoutNameErr(name);
-		} else if (parameter.equals("")) {showWithoutKeyErr(parameter);
+		if (name.isBlank()) {showWithoutNameErr(name);
+		} else if (parameter.isBlank()) {showWithoutKeyErr(parameter);
 		} else {
-			for (int i = 0; i < propsArray.size(); i++) {
-				Properties p = propsArray.get(i);
+			for (Properties p : propsArray) {
 				if (p.containsKey("propName")) {
 					if (p.getProperty("propName").equals(name)) {
-						log("Запись в проперчес " + name + " параметра " + value + "' (" + value.getClass().getTypeName() + ").");
+						log("Запись в " + name + " параметра " + value + "' (" + value.getClass().getTypeName() + ").");
 						if (p.containsKey(parameter)) {p.setProperty(parameter, String.valueOf(value));
 						} else {p.putIfAbsent(parameter, String.valueOf(value));}
 						return;
@@ -205,12 +206,17 @@ public class IOM {
 			}
 		}
 	}
-	
+
+
 	// сохранить конкретное хранилище на диск:
-	public synchronized static Boolean save(Object propertiName) {
+	public synchronized static Boolean save(Properties property) {
+		return save(property.getProperty("propName"));
+	}
+
+	public synchronized static Boolean save(String propertiName) {
 		for (Properties properties : propsArray) {
-			if (properties.get("propName").equals(propertiName.toString())) {
-				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(new File(properties.getProperty("propFile")), false), StandardCharsets.UTF_8)) {
+			if (properties.getProperty("propName").equals(propertiName)) {
+				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(properties.getProperty("propFile"), false), StandardCharsets.UTF_8)) {
 					properties.store(osw, "IOM_SAVE");
 					log("Сохранение " + properties.getProperty("propFile") + " завершено!");
 					return true;
@@ -228,11 +234,16 @@ public class IOM {
 	// сохранить все активные хранилища на диск:
 	public synchronized static void saveAll() {
 		log("Каскадное сохранение всех файлов...");
-		for (Properties properties : propsArray) {save(properties.get("propName"));}
+		for (Properties properties : propsArray) {save(properties);}
 	}
 
+
 	// загрузить конкретное хранилище из файла на диске:
-	public synchronized static Boolean load(Object propertiName) {
+	public synchronized static Boolean load(Properties property) {
+		return load(property.getProperty("propName"));
+	}
+
+	public synchronized static Boolean load(String propertiName) {
 		for (Properties properties : propsArray) {
 			if (properties.get("propName").equals(propertiName.toString())) {
 				try (InputStreamReader ISR = new InputStreamReader(new FileInputStream(properties.getProperty("propFile")), StandardCharsets.UTF_8)) {
@@ -294,23 +305,25 @@ public class IOM {
 	
 	// проверка директорий и файлов хранилищ:
 	private static boolean isFileExist(File file) {
-		Path parentDir = Paths.get(file.getParentFile().toURI());
+		Path parentDir = file.getParentFile().toPath();
 		while (Files.notExists(parentDir)) {
 			log("Попытка создания директории '" + parentDir + "'...");
 			
 			try {Files.createDirectory(parentDir);
 			} catch (IOException i0) {
+				log("Провал создания директории '" + file + "': " + i0.getMessage());
 				i0.printStackTrace();
 				return false;
 			}
 		}
 		
-		Path self = Paths.get(file.toURI());
-		while (Files.notExists(self)) {
+		Path self = file.toPath();
+		if (Files.notExists(self)) {
 			log("Попытка создания файла '" + file + "'...");
 			
 			try {Files.createFile(self);
 			} catch (IOException e1) {
+				log("Провал создания файла '" + file + "': " + e1.getMessage());
 				e1.printStackTrace();
 				return false;
 			}
