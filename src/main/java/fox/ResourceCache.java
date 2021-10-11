@@ -9,14 +9,11 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
 
 public class ResourceCache {
-    private final static Map<String, byte[]> cache = Collections.synchronizedMap(new LinkedHashMap<>());
+    private final static Map<String, Map<Path, byte[]>> cache = Collections.synchronizedMap(new LinkedHashMap<>());
 
     private final static long MAX_MEMORY = Runtime.getRuntime().maxMemory() - 1L;
     private static long USED_MEMORY, MAX_LOADING;
@@ -38,8 +35,8 @@ public class ResourceCache {
             try {
                 int clearedCount = 0;
                 if (cache.size() > MIN_ELEMENTS_CASH_COUNT_TO_CLEARING) {
-                    for (Entry<String, byte[]> entry : cache.entrySet()) {
-                        if (entry.getValue().length > MAX_LOADING * 0.05f) { // если кэшированная штука занимает больше 5% разрешенной памяти.
+                    for (Entry<String, Map<Path, byte[]>> entry : cache.entrySet()) {
+                        if (entry.getValue().get(0).length > MAX_LOADING * 0.05f) { // если кэшированная штука занимает больше 5% разрешенной памяти.
                             cache.remove(entry.getKey());
                             clearedCount++;
                         }
@@ -59,30 +56,22 @@ public class ResourceCache {
 
     // заливаем новый ресурс:
     public synchronized static void add(Object index, File file) throws Exception {
-        add(index, file, false);
-    }
-
-    public synchronized static void add(Object index, BufferedImage bImage) throws Exception {
-        add(index, bImage, false);
+        add(index.toString(), file.toURI().toURL());
     }
 
     public synchronized static void add(Object index, URL fileURL) throws Exception {
-        add(index, fileURL, false);
+        add(index.toString(), Paths.get(fileURL.getFile()));
     }
 
-    public synchronized static void add(Object index, URL fileURL, boolean isImage) throws Exception {
-        add(index, new File(fileURL.getFile()), isImage);
-    }
-
-    public synchronized static void add(Object index, Object file, boolean isImage) throws Exception {
-        if (file == null || Files.notExists(Paths.get(((File) file).toURI()))) {
+    public synchronized static void add(String index, Path file) throws Exception {
+        if (file == null || Files.notExists(file)) {
             throw new RuntimeException("Object file cant be a NULL and should exist!");
         }
         log("Try to add the resource '" + index + "'...");
 
-        if (file instanceof Path) {
-            cache.put(String.valueOf(index), Files.readAllBytes((Path) file));
-        }
+        Map<Path, byte[]> tmp = new HashMap<>();
+        tmp.put(file, Files.readAllBytes(file));
+        cache.put(index, tmp);
 
         memoryControl();
     }
@@ -123,7 +112,7 @@ public class ResourceCache {
         BufferedImage result = null;
         if (cache.containsKey(name)) {
             try {
-                ByteArrayInputStream bais = new ByteArrayInputStream(cache.get(index.toString()));
+                ByteArrayInputStream bais = new ByteArrayInputStream(cache.get(index.toString()).get(0));
                 result = ImageIO.read(bais);
             } catch (Exception e) {
                 log("Resource '" + name + "' is not writable!");
@@ -140,7 +129,7 @@ public class ResourceCache {
 
     // получить ширину-высоту картинки до её получения отсюда:
     public synchronized static Dimension getBImageDim(Object index) {
-        ByteArrayInputStream bais = new ByteArrayInputStream(cache.get(index.toString()));
+        ByteArrayInputStream bais = new ByteArrayInputStream(cache.get(index.toString()).get(0));
         try {
             BufferedImage bim = ImageIO.read(bais);
             return new Dimension(bim.getWidth(), bim.getHeight());
@@ -149,11 +138,18 @@ public class ResourceCache {
         }
     }
 
+    public static Path getFile(String name) {
+        if (cache.containsKey(name)) {
+            return cache.get(name).keySet().stream().findFirst().get();
+        }
+        return null;
+    }
+
     // получить массив байтов ресурса:
     public synchronized static byte[] getBytes(Object index) {
         String name = String.valueOf(index);
         if (cache.containsKey(name)) {
-            return cache.get(name);
+            return cache.get(name).get(0);
         } else {
             log("RM.getBytes(): File with name '" + name + "' dont exist into cache!");
             return null;
@@ -171,7 +167,7 @@ public class ResourceCache {
     public synchronized static long getCacheLength() {
         long bytesMapSize = 0L;
         for (int i = 0; i < cache.size(); i++) {
-            bytesMapSize += cache.get(String.valueOf(i)).length;
+            bytesMapSize += cache.get(String.valueOf(i)).get(0).length;
         }
         return bytesMapSize;
     }
@@ -190,4 +186,6 @@ public class ResourceCache {
             System.out.println(message);
         }
     }
+
+
 }
