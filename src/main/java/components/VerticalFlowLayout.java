@@ -7,8 +7,6 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.io.Serializable;
 
-
-@SuppressWarnings("serial")
 public class VerticalFlowLayout implements LayoutManager, Serializable {
 	/**
 	 * This value indicates that each row of components should be left-justified.
