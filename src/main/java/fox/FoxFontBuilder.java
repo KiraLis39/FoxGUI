@@ -59,7 +59,9 @@ public class FoxFontBuilder {
         }
 
         try {
-            fontsDirectory = Files.createDirectory(Paths.get("./fonts/"));
+            if (Files.notExists(Paths.get("./fonts/"))) {
+                fontsDirectory = Files.createDirectory(Paths.get("./fonts/"));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -192,6 +194,9 @@ public class FoxFontBuilder {
     }
 
     public static void setFontsDirectory(Path _fontsDirectory) {
+        if (Files.notExists(Paths.get("./fonts/"))) {
+            log("The fonts path is not exist! (" + _fontsDirectory + ").");
+        }
         fontsDirectory = _fontsDirectory;
     }
 
