@@ -12,10 +12,6 @@ import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
 
-/**
- * @author KiraLis39
- * @version 1.21.2
- */
 public class FoxFontBuilder {
     public enum FONT {
         COMIC_SANS("Comic Sans MS"),
@@ -34,7 +30,8 @@ public class FoxFontBuilder {
         PAPYRYS("Papyrus"),
         LEELAWADEE("Leelawadee UI"),
         SEGOE_UI_SYMBOL("Segoe UI Symbol"),
-        TIMES_NEW_ROMAN("Times New Roman");
+        TIMES_NEW_ROMAN("Times New Roman"),
+        COURIER_NEW("Courier New");
 
         String value;
 
@@ -51,19 +48,11 @@ public class FoxFontBuilder {
 
     private static List<String> fArr = new LinkedList<>(); // набор шрифтов по-умолчанию.
     private static Path fontsDirectory; // папка с дополнительными шрифтами TRUETYPE
-    private static boolean isLogEnabled;
+    private static boolean isLogEnabled = true;
 
     static {
         for (FONT value : FONT.values()) {
             fArr.add(value.getValue());
-        }
-
-        try {
-            if (Files.notExists(Paths.get("./fonts/"))) {
-                fontsDirectory = Files.createDirectory(Paths.get("./fonts/"));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -81,19 +70,26 @@ public class FoxFontBuilder {
         }
 
         if (!isFontExist(ID)) {
+            if (fontsDirectory == null) {
+                fontsDirectory = Paths.get("./fonts/");
+                try {
+                    if (Files.notExists(fontsDirectory)) {
+                        Files.createDirectory(fontsDirectory);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             if (fontsDirectory != null) {
                 // если в ОС нет шрифта, но указана папка c ним:
                 try {
                     log("Now will be setup fonts...");
-                    for (File fontDir : fontsDirectory.toFile().listFiles()) {
-                        File[] fonts = fontDir.listFiles();
-                        for (File font : fonts) {
-                            try {
-                                register(Font.createFont(Font.TRUETYPE_FONT, font));
-                            } catch (Exception e) {
-                                log("Не удалось подключить шрифт " + font.getName() + " как TRUETYPE." + e.getMessage());
-                                continue;
-                            }
+                    for (File font : fontsDirectory.toFile().listFiles()) {
+                        try {
+                            register(Font.createFont(Font.TRUETYPE_FONT, font));
+                        } catch (Exception e) {
+                            log("Не удалось подключить шрифт " + font.getName() + " как TRUETYPE." + e.getMessage());
+                            continue;
                         }
                     }
                 } catch (Exception e) {
@@ -224,7 +220,7 @@ public class FoxFontBuilder {
 
     private static void log(String message) {
         if (isLogEnabled) {
-            System.out.println(FoxFontBuilder.class.getName() + ": " + message);
+            Out.Print(FoxFontBuilder.class, Out.LEVEL.INFO, message);
         }
     }
 }

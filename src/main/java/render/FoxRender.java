@@ -10,8 +10,6 @@ public class FoxRender {
 	private FoxRender() {}
 	
 	public static Graphics2D setLowRender(Graphics2D g2D) {
-		g2D.setRenderingHints(null);
-		
 		g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g2D.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
 		g2D.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);

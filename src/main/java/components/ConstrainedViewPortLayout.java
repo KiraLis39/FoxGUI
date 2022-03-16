@@ -4,14 +4,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import javax.swing.ViewportLayout;
 
-/**
- * Its a layout for JScrollPanes. It helps arrange the text correctly
- * by panel resizes. Should be...
- * 
- * Used as myScrollPane.getViewport().setLayout(new ConstrainedViewPortLayout());
- */
 public class ConstrainedViewPortLayout extends ViewportLayout {
-	
 	@Override
     public Dimension preferredLayoutSize(Container parent) {
         Dimension preferredViewSize = super.preferredLayoutSize(parent);

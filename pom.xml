@@ -8,11 +8,11 @@
   <packaging>jar</packaging>
 
   <name>FoxGUI</name>
-  <url>http://maven.apache.org</url>
+  <url>https://maven.apache.org</url>
 
   <properties>
-  	<maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+  	<maven.compiler.source>16</maven.compiler.source>
+    <maven.compiler.target>16</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -53,6 +53,12 @@
       <version>1.18.22</version>
       <scope>provided</scope>
     </dependency>
+      <dependency>
+          <groupId>FoxLib39</groupId>
+          <artifactId>FoxOut</artifactId>
+          <version>06.21</version>
+          <scope>compile</scope>
+      </dependency>
 
   </dependencies>
 </project>

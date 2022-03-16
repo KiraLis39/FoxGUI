@@ -55,15 +55,22 @@ public class ResourceCache {
     }
 
     // заливаем новый ресурс:
-    public synchronized static void add(Object index, File file) throws Exception {
-        add(index.toString(), file.toURI().toURL());
+    public synchronized static void add(File file) throws Exception {
+        String name = getFileNameWithoutExt(file.getName());
+        add(name, file.toPath());
     }
 
-    public synchronized static void add(Object index, URL fileURL) throws Exception {
-        add(index.toString(), Paths.get(fileURL.getFile()));
+    public synchronized static void add(URL fileURL) throws Exception {
+        String name = getFileNameWithoutExt(new File(fileURL.toURI()).getName());
+        add(name, Paths.get(fileURL.getFile()));
     }
 
-    public synchronized static void add(String index, Path file) throws Exception {
+    public synchronized static void add(Path file) throws Exception {
+        String name = getFileNameWithoutExt(file.toFile().getName());
+        add(name, file);
+    }
+
+    private synchronized static void add(String index, Path file) throws Exception {
         if (file == null || Files.notExists(file)) {
             throw new RuntimeException("Object file cant be a NULL and should exist!");
         }
@@ -74,6 +81,10 @@ public class ResourceCache {
         cache.put(index, tmp);
 
         memoryControl();
+    }
+
+    private static String getFileNameWithoutExt(String name) {
+        return name.charAt(name.length() - 4) == '.' ? name.substring(0, name.length() - 4) : name;
     }
 
     // удаляем ресурс:
