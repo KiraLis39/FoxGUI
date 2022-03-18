@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
 
+
 public class FoxFontBuilder {
     public enum FONT {
         COMIC_SANS("Comic Sans MS"),
@@ -33,7 +34,7 @@ public class FoxFontBuilder {
         TIMES_NEW_ROMAN("Times New Roman"),
         COURIER_NEW("Courier New");
 
-        String value;
+        final String value;
 
         FONT(String value) {
             this.value = value;
@@ -44,11 +45,10 @@ public class FoxFontBuilder {
         }
     }
 
-    private static FONT defaultFont = FONT.ARIAL_NARROW;
+    private static final FONT defaultFont = FONT.ARIAL_NARROW;
 
-    private static List<String> fArr = new LinkedList<>(); // набор шрифтов по-умолчанию.
+    private static final List<String> fArr = new LinkedList<>(); // набор шрифтов по-умолчанию.
     private static Path fontsDirectory; // папка с дополнительными шрифтами TRUETYPE
-    private static boolean isLogEnabled = true;
 
     static {
         for (FONT value : FONT.values()) {
@@ -219,8 +219,6 @@ public class FoxFontBuilder {
     }
 
     private static void log(String message) {
-        if (isLogEnabled) {
-            Out.Print(FoxFontBuilder.class, Out.LEVEL.INFO, message);
-        }
+        Out.Print(FoxFontBuilder.class, Out.LEVEL.INFO, message);
     }
 }
