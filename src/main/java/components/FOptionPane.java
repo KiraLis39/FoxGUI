@@ -7,8 +7,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 
 public class FOptionPane extends JDialog implements ActionListener {
@@ -19,7 +19,6 @@ public class FOptionPane extends JDialog implements ActionListener {
     private JButton NO_BUTTON, YES_BUTTON;
     private BufferedImage ico;
     private int answer = -1, timeout = 20;
-    private static Thread toThread;
     private static JLabel toLabel;
 
     public FOptionPane(String title, String message) {
@@ -32,7 +31,7 @@ public class FOptionPane extends JDialog implements ActionListener {
             this.ico = ico;
         } else {
             try {
-                this.ico = ImageIO.read(new File("./resources/pic/favorite.png"));
+                this.ico = ImageIO.read(FOptionPane.class.getClassLoader().getResourceAsStream("components/favorite.png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -68,7 +67,7 @@ public class FOptionPane extends JDialog implements ActionListener {
 
                                     this);
                         }
-                    };
+                    }
 
                     {
                         setPreferredSize(new Dimension(64, 0));
@@ -116,7 +115,7 @@ public class FOptionPane extends JDialog implements ActionListener {
                         setOpaque(false);
 
                         switch (FOptionPane.this.type) {
-                            case DEFAULT:
+                            case DEFAULT -> {
                                 OK_BUTTON = new JButton("OK") {
                                     {
                                         setActionCommand("ok");
@@ -124,8 +123,8 @@ public class FOptionPane extends JDialog implements ActionListener {
                                     }
                                 };
                                 add(OK_BUTTON);
-                                break;
-                            case YES_NO_TYPE:
+                            }
+                            case YES_NO_TYPE -> {
                                 YES_BUTTON = new JButton("Да") {
                                     {
                                         setActionCommand("yes");
@@ -140,9 +139,9 @@ public class FOptionPane extends JDialog implements ActionListener {
                                 };
                                 add(YES_BUTTON);
                                 add(NO_BUTTON);
-                                break;
-                            default:
-
+                            }
+                            default -> {
+                            }
                         }
                     }
                 };
@@ -156,12 +155,14 @@ public class FOptionPane extends JDialog implements ActionListener {
 
         add(basePane);
 
-        toThread = new Thread(() -> {
+        Thread toThread = new Thread(() -> {
             while (timeout > 0) {
                 timeout--;
                 toLabel.setText("Осталось: " + timeout + " сек.");
-                try {Thread.sleep(1000);
-                } catch (InterruptedException e) {e.printStackTrace();}
+                try {TimeUnit.MILLISECONDS.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             answer = 1;
             FOptionPane.this.dispose();
@@ -180,12 +181,10 @@ public class FOptionPane extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
-            case "yes": answer = 0;
-                break;
-            case "no": answer = -1;
-                break;
-            case "ok":
-            default:
+            case "yes" -> answer = 0;
+            case "no" -> answer = -1;
+            case "ok", default -> {
+            }
         }
 
         FOptionPane.this.dispose();
