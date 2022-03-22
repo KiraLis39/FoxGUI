@@ -183,8 +183,7 @@ public class FOptionPane extends JDialog implements ActionListener {
         switch (e.getActionCommand()) {
             case "yes" -> answer = 0;
             case "no" -> answer = -1;
-            case "ok", default -> {
-            }
+            default -> {}
         }
 
         FOptionPane.this.dispose();
