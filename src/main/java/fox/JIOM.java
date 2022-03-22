@@ -1,73 +1,83 @@
 package fox;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import fox.interfaces.Configurable;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import fox.interfaces.JConfigurable;
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.SneakyThrows;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
+@ToString
+@EqualsAndHashCode
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class JIOM {
-    static boolean isLogEnabled = true;
     static ObjectMapper objectMapper;
 
     private JIOM() {}
 
     private static void init() {
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        final JavaTimeModule timeModule = new JavaTimeModule();
+        timeModule.addSerializer(
+                LocalDateTime.class,
+                new LocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
+        );
+        objectMapper = new ObjectMapper() {
+            {
+                registerModule(timeModule);
+                disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            }
+        };
     }
 
-    @SneakyThrows
-    public static <T extends Configurable> T fromFile(Class<T> clazz, final Path path) throws IOException {
+    public static <T extends JConfigurable> T fileToDto(final Path dtoPath, Class<T> clazz) throws IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if (objectMapper == null) {
             init();
         }
 
-        checkFileExisting(path);
+        checkFileExisting(dtoPath);
 
-        T result;
+        T dto;
         try {
-            result = objectMapper.readValue(path.toFile(), clazz);
+            dto = objectMapper.readValue(dtoPath.toFile(), clazz);
         } catch (MismatchedInputException mie) {
-            log("File '" + path.getFileName() + "' is empty. Nothing read.");
-            result = clazz.getDeclaredConstructor().newInstance();
+            Out.Print(JIOM.class, Out.LEVEL.ACCENT, "File '" + dtoPath.getFileName() + "' is empty. Nothing read.");
+            dto = clazz.getDeclaredConstructor().newInstance();
         }
 
-        result.setSource(path);
-        return result;
+        dto.setSource(dtoPath);
+        return dto;
     }
 
-    private static void log(String s) {
-        if (isLogEnabled) {
-            System.out.println(s);
+    public static void dtoToFile(final JConfigurable dto) throws IOException {
+        if (dto.getSource() == null) {
+            throw new RuntimeException("Source of class '" + dto.getClass() + "' is NULL!");
         }
+
+        checkFileExisting(dto.getSource());
+        objectMapper.writeValue(dto.getSource().toFile(), dto);
     }
 
     private static void checkFileExisting(Path path) throws IOException {
         if (Files.notExists(path)) {
             if (Files.notExists(path.getParent())) {
-                Files.createDirectories(path);
+                Files.createDirectories(path); // path.getParent()
             }
             Files.createFile(path);
         }
-    }
-
-    public static void toFile(final Configurable confClass) throws IOException {
-        if (confClass.getSource() == null) {
-            throw new RuntimeException("Source of class '" + confClass.getClass() + "' is NULL!");
-        }
-
-        checkFileExisting(confClass.getSource());
-        objectMapper.writeValue(confClass.getSource().toFile(), confClass);
     }
 }
