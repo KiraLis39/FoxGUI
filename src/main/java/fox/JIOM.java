@@ -69,13 +69,13 @@ public class JIOM {
         }
 
         checkFileExisting(dto.getSource());
-        objectMapper.writeValue(dto.getSource().toFile(), dto);
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(dto.getSource().toFile(), dto);
     }
 
     private static void checkFileExisting(Path path) throws IOException {
         if (Files.notExists(path)) {
             if (Files.notExists(path.getParent())) {
-                Files.createDirectories(path); // path.getParent()
+                Files.createDirectories(path.getParent());
             }
             Files.createFile(path);
         }
