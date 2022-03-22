@@ -80,4 +80,11 @@ public class JIOM {
             Files.createFile(path);
         }
     }
+
+    public static ObjectMapper getMapper() {
+        if (objectMapper == null) {
+            init();
+        }
+        return objectMapper;
+    }
 }
