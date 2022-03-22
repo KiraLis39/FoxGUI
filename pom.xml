@@ -68,7 +68,7 @@
         <dependency>
             <groupId>FoxLib39</groupId>
             <artifactId>FoxOut</artifactId>
-            <version>06.21</version>
+            <version>06.22</version>
             <scope>compile</scope>
         </dependency>
 
