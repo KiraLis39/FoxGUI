@@ -39,9 +39,9 @@ public class FoxConsole extends JDialog {
         setUndecorated(true);
         setVisible(false);
 
-        inAc();
-
         createNewConsole();
+
+        inAc();
     }
 
     private void inAc() {
