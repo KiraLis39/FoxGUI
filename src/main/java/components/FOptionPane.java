@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 
@@ -31,9 +32,11 @@ public class FOptionPane extends JDialog implements ActionListener {
             this.ico = ico;
         } else {
             try {
-                this.ico = ImageIO.read(FOptionPane.class.getClassLoader().getResourceAsStream("components/favorite.png"));
-            } catch (IOException e) {
-                e.printStackTrace();
+                InputStream iconStream = FOptionPane.class.getClassLoader().getResourceAsStream("components/favorite.png");
+                this.ico = ImageIO.read(iconStream);
+                iconStream.close();
+            } catch (Exception e) {
+                /* IGNORE WITHOUT ICON */
             }
         }
 
