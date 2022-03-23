@@ -149,7 +149,9 @@ public class FoxTipsEngine {
 						add(new JButton() {
 							@Override
 							public void paintComponent(Graphics g) {
-								g.drawImage(icon, 0, 0, 64, 64, this);
+								if (icon != null) {
+									g.drawImage(icon, 0, 0, 64, 64, this);
+								}
 								g.dispose();
 							};
 							
