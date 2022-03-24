@@ -31,11 +31,11 @@ public class FOptionPane extends JDialog implements ActionListener {
         if (ico != null) {
             this.ico = ico;
         } else {
-            try {
-                InputStream iconStream = FOptionPane.class.getClassLoader().getResourceAsStream("components/favorite.png");
-                this.ico = ImageIO.read(iconStream);
-                iconStream.close();
-            } catch (Exception e) {
+            try (InputStream iconStream = FOptionPane.class.getClassLoader().getResourceAsStream("favorite.png")) {
+                if (iconStream != null) {
+                    this.ico = ImageIO.read(iconStream);
+                }
+            } catch (IOException e) {
                 /* IGNORE WITHOUT ICON */
             }
         }
