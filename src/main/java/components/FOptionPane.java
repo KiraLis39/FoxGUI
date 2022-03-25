@@ -20,7 +20,7 @@ public class FOptionPane extends JDialog implements ActionListener {
     private JButton NO_BUTTON, YES_BUTTON;
     private BufferedImage ico;
     private int answer = -1, timeout = 20;
-    private static JLabel toLabel;
+    private static JLabel timeLastLabel, titleLabel;
 
     public FOptionPane(String title, String message) {
         this(title, message, null, null, true);
@@ -39,10 +39,6 @@ public class FOptionPane extends JDialog implements ActionListener {
                 /* IGNORE WITHOUT ICON */
             }
         }
-
-        setModal(isModal);
-        setModalityType(ModalityType.DOCUMENT_MODAL);
-        setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
 
         setTitle(title);
         setAlwaysOnTop(true);
@@ -77,9 +73,23 @@ public class FOptionPane extends JDialog implements ActionListener {
                     }
                 };
 
-                toLabel = new JLabel() {
+                JPanel upLabelPane = new JPanel(new BorderLayout(3,3)) {
                     {
-                        setForeground(Color.GRAY);
+                        setOpaque(false);
+
+                        titleLabel = new JLabel(FOptionPane.this.getTitle()) {
+                            {
+                                setForeground(Color.WHITE);
+                            }
+                        };
+                        timeLastLabel = new JLabel() {
+                            {
+                                setForeground(Color.GRAY);
+                            }
+                        };
+
+                        add(titleLabel, BorderLayout.WEST);
+                        add(timeLastLabel, BorderLayout.EAST);
                     }
                 };
 
@@ -149,8 +159,8 @@ public class FOptionPane extends JDialog implements ActionListener {
                     }
                 };
 
+                add(upLabelPane, BorderLayout.NORTH);
                 add(icoPane, BorderLayout.WEST);
-                add(toLabel, BorderLayout.NORTH);
                 add(mesPane, BorderLayout.CENTER);
                 add(btnPane, BorderLayout.SOUTH);
             }
@@ -161,7 +171,7 @@ public class FOptionPane extends JDialog implements ActionListener {
         Thread toThread = new Thread(() -> {
             while (timeout > 0) {
                 timeout--;
-                toLabel.setText("Осталось: " + timeout + " сек.");
+                timeLastLabel.setText("Осталось: " + timeout + " сек.");
                 try {TimeUnit.MILLISECONDS.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -174,6 +184,10 @@ public class FOptionPane extends JDialog implements ActionListener {
 
         pack();
         setLocationRelativeTo(null);
+
+        setModal(isModal);
+        setModalityType(ModalityType.APPLICATION_MODAL);
+        setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
         setVisible(true);
     }
 
