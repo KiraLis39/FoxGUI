@@ -1,5 +1,8 @@
 package fox;
 
+import lombok.NonNull;
+import render.FoxRender;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -18,7 +21,7 @@ import javax.swing.ImageIcon;
 public class FoxCursor {
 	private FoxCursor() {}
 	
-	public static Cursor createCursor(Path imagePath) throws IOException {
+	public static Cursor createCursor(@NonNull Path imagePath) throws IOException {
 		BufferedImage ico = ImageIO.read(imagePath.toFile());
 		if (ico == null) {
 			System.err.println("fox.games.FoxCursors (getCursor): Cursor " + imagePath + " has not found!");
@@ -30,19 +33,19 @@ public class FoxCursor {
 		return null;		
 	}
 	
-	public static Cursor createCursor(BufferedImage bImage, String name) {
+	public static Cursor createCursor(@NonNull BufferedImage bImage, String name) {
 		try {return Toolkit.getDefaultToolkit().createCustomCursor(bImage, new Point(0,0), name);
 		} catch (Exception e) {e.printStackTrace();}		
 		return null;
 	}
 	
-	public static Cursor createCursor(ImageIcon iImage, String name) {
+	public static Cursor createCursor(@NonNull ImageIcon iImage, String name) {
 		try {return Toolkit.getDefaultToolkit().createCustomCursor(iImage.getImage(), new Point(0,0), name);
 		} catch (Exception e) {e.printStackTrace();}		
 		return null;
 	}
 	
-	public static Cursor createCursor(Icon ico, String curName) {
+	public static Cursor createCursor(@NonNull Icon ico, String curName) {
 		try {
 			BufferedImage tmp = new BufferedImage(ico.getIconWidth(), ico.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2d = (Graphics2D) tmp.getGraphics();

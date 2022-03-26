@@ -1,6 +1,9 @@
 package fox;
 
+import lombok.Data;
+
 import java.awt.Window;
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -10,17 +13,26 @@ import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
+@Data
 public class InputAction {
-	static Map<String, JComponent> compMap = new LinkedHashMap<String, JComponent>();
+	public enum FOCUS_TYPE {WHEN_FOCUSED, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, WHEN_IN_FOCUSED_WINDOW}
+	private static FOCUS_TYPE focusType = FOCUS_TYPE.WHEN_IN_FOCUSED_WINDOW;
+	private static Map<String, JComponent> compMap = new LinkedHashMap<>();
 
 	public static void add(String name, Window window) {add(name, (JComponent) window.getComponent(0));}
 	
-	public static void add(String name, JComponent comp) {compMap.put(name, comp);}
-	
-	
+	public static void add(String name, JComponent comp) {
+		compMap.put(name, comp);
+	}
+
+	public static void set(FOCUS_TYPE _focusType, String name, String commandName, int key, int mod, AbstractAction action) {
+		focusType = _focusType;
+		set(name, commandName, key, mod, action);
+	}
+
 	public static void set(String name, String commandName, int key, int mod, AbstractAction action) {
 		if (compMap.containsKey(name)) {
-			(compMap.get(name)).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key, mod), commandName);
+			(compMap.get(name)).getInputMap(focusType.ordinal()).put(KeyStroke.getKeyStroke(key, mod), commandName);
 			(compMap.get(name)).getActionMap().put(commandName, action);
 			return;
 		}

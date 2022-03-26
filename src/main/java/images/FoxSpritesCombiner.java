@@ -1,8 +1,10 @@
 package images;
 
 import render.FoxRender;
-import java.awt.Graphics2D;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.VolatileImage;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -10,7 +12,7 @@ public class FoxSpritesCombiner {
 	private final static Map<String, BufferedImage[]> sptitesMap = new LinkedHashMap<String, BufferedImage[]>();
 		
 	private FoxSpritesCombiner() {}
-	
+
 	public static BufferedImage[] addSpritelist(String spriteListName, BufferedImage image, int wCount, int hCount) {
 		BufferedImage[] result = null;
 		
@@ -44,7 +46,7 @@ public class FoxSpritesCombiner {
 			for (int x = 0; x < w; x++) {
 				result[i] = new BufferedImage(spriteWidth, spriteHeight, BufferedImage.TYPE_INT_ARGB);
 				g2D = result[i].createGraphics();
-				FoxRender.setHQRender(g2D);
+				FoxRender.setRender(g2D, FoxRender.RENDER.HIGH);
 				
 				g2D.drawImage(image, 
 						0, 	0, 

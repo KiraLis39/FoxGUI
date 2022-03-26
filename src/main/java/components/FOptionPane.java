@@ -11,19 +11,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
-
 public class FOptionPane extends JDialog implements ActionListener {
     public enum TYPE {DEFAULT, YES_NO_TYPE}
     private TYPE type;
-
+    private Thread toThread;
     private JButton OK_BUTTON;
     private JButton NO_BUTTON, YES_BUTTON;
     private BufferedImage ico;
     private int answer = -1, timeout = 20;
-    private static JLabel timeLastLabel, titleLabel;
+    private JLabel timeLastLabel, titleLabel;
 
     public FOptionPane(String title, String message) {
         this(title, message, null, null, true);
+    }
+
+    public FOptionPane(String title, String message, BufferedImage ico) {
+        this(title, message, null, ico, true);
+    }
+
+    public FOptionPane(String title, String message, TYPE type) {
+        this(title, message, type, null, true);
     }
 
     public FOptionPane(String title, String message, TYPE type, BufferedImage ico, boolean isModal) {
@@ -44,7 +51,7 @@ public class FOptionPane extends JDialog implements ActionListener {
         setAlwaysOnTop(true);
         setUndecorated(true);
         setPreferredSize(new Dimension(300, 150));
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         getRootPane().setBorder(new EmptyBorder(3,3,3,3));
 
         JPanel basePane = new JPanel(new BorderLayout(3,3)) {
@@ -168,13 +175,12 @@ public class FOptionPane extends JDialog implements ActionListener {
 
         add(basePane);
 
-        Thread toThread = new Thread(() -> {
+        toThread = new Thread(() -> {
             while (timeout > 0) {
                 timeout--;
                 timeLastLabel.setText("Осталось: " + timeout + " сек.");
                 try {TimeUnit.MILLISECONDS.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                } catch (InterruptedException ignore) {
                 }
             }
             answer = 1;
@@ -192,15 +198,17 @@ public class FOptionPane extends JDialog implements ActionListener {
     }
 
     public int get() {
-        return answer;
+        int result = answer;
+        timeout = 0;
+        return result;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "yes" -> answer = 0;
-            case "no" -> answer = -1;
-            default -> {}
+            case "no" -> answer = 1;
+            default -> answer = -2;
         }
 
         FOptionPane.this.dispose();

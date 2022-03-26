@@ -1,5 +1,7 @@
 package fox;
 
+import fox.Out.LEVEL;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -44,9 +46,9 @@ public class FoxFontBuilder {
             return value;
         }
     }
-
     private static final FONT defaultFont = FONT.ARIAL_NARROW;
 
+    private static GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
     private static final List<String> fArr = new LinkedList<>(); // набор шрифтов по-умолчанию.
     private static Path fontsDirectory; // папка с дополнительными шрифтами TRUETYPE
 
@@ -56,20 +58,27 @@ public class FoxFontBuilder {
         }
     }
 
-    private FoxFontBuilder() {}
+    private FoxFontBuilder(GraphicsEnvironment _gEnv) {
+        gEnv = _gEnv;
+    }
 
 
     // выбор шрифта:
     public static Font setFoxFont(FONT fontName, float fontSize, Boolean isBold) {
-        return setFoxFont(fontName.ordinal(), Math.round(fontSize), isBold);
+        return setFoxFont(fontName.ordinal(), Math.round(fontSize), isBold, gEnv);
     }
-    public static Font setFoxFont(int ID, int fontSize, Boolean isBold) {
+
+    public static Font setFoxFont(FONT fontName, float fontSize, Boolean isBold, GraphicsEnvironment gEnv) {
+        return setFoxFont(fontName.ordinal(), Math.round(fontSize), isBold, gEnv);
+    }
+
+    public static Font setFoxFont(int ID, int fontSize, Boolean isBold, GraphicsEnvironment gEnv) {
         if (ID > fArr.size() - 1) {
-            errMessage(ID);
-            return new Font(fArr.get(defaultFont.ordinal()), isBold ? Font.BOLD : Font.PLAIN, fontSize);
+            fontNotExistsMessage(ID);
+            return new Font(fArr.get(defaultFont.ordinal()), isBold ? Font.BOLD : Font.PLAIN, fontSize); // BOLD, ITALIC, BOLD+ITALIC
         }
 
-        if (!isFontExist(ID)) {
+        if (!isFontExist(ID, gEnv)) {
             if (fontsDirectory == null) {
                 fontsDirectory = Paths.get("./fonts/");
                 try {
@@ -86,7 +95,7 @@ public class FoxFontBuilder {
                     log("Now will be setup fonts...");
                     for (File font : fontsDirectory.toFile().listFiles()) {
                         try {
-                            register(Font.createFont(Font.TRUETYPE_FONT, font));
+                            register(Font.createFont(Font.TRUETYPE_FONT, font), gEnv);
                         } catch (Exception e) {
                             log("Не удалось подключить шрифт " + font.getName() + " как TRUETYPE." + e.getMessage());
                             continue;
@@ -104,7 +113,7 @@ public class FoxFontBuilder {
             }
 
             // если не получилось, возвращаем шрифт по-умолчанию:
-            if (!isFontExist(ID)) {
+            if (!isFontExist(ID, gEnv)) {
                 return new Font(fArr.get(defaultFont.ordinal()), isBold ? Font.BOLD : Font.PLAIN, fontSize);
             }
         }
@@ -112,8 +121,8 @@ public class FoxFontBuilder {
         return new Font(fArr.get(ID), isBold ? Font.BOLD : Font.PLAIN, fontSize);
     }
 
-    private static boolean isFontExist(int ID) {
-        for (String fname : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
+    private static boolean isFontExist(int ID, GraphicsEnvironment gEnv) {
+        for (String fname : gEnv.getAvailableFontFamilyNames()) {
             if (fname.equalsIgnoreCase(fArr.get(ID))) {
                 return true;
             }
@@ -177,7 +186,7 @@ public class FoxFontBuilder {
         }
     }
 
-    private static void errMessage(int ID) {
+    private static void fontNotExistsMessage(int ID) {
         JOptionPane.showMessageDialog(null,
                 "<html>В FoxFontBuilder нет шрифта с ID " + ID + ".<br>"
                         + "Воспользуйтесь методами для получения количества доступных<br>"
@@ -208,10 +217,13 @@ public class FoxFontBuilder {
     /**
      * @return index of registered font
      */
-    public static int register(Font f) {
-        GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(f);
-        fArr.add(f.getFontName());
-        return fArr.indexOf(f.getFontName());
+    public static int register(Font f, GraphicsEnvironment gEnv) {
+        if (gEnv.registerFont(f)) {
+            fArr.add(f.getFontName());
+            return fArr.indexOf(f.getFontName());
+        } else {
+            throw new RuntimeException("FoxFontBuilder.register: Can`t register the font " + f);
+        }
 
 //		InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream("roboto-bold.ttf");
 //		Font font = Font.createFont(Font.TRUETYPE_FONT, stream).deriveFont(48f);
@@ -219,6 +231,6 @@ public class FoxFontBuilder {
     }
 
     private static void log(String message) {
-        Out.Print(FoxFontBuilder.class, Out.LEVEL.INFO, message);
+        Out.Print(FoxFontBuilder.class, LEVEL.DEBUG, message);
     }
 }

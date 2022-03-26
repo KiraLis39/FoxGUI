@@ -1,5 +1,7 @@
 package render.foxLFui;
 
+import render.FoxRender;
+
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicToolBarUI;
@@ -56,7 +58,7 @@ public class MyToolBarUI extends BasicToolBarUI {
 
     public void paint(Graphics g, JComponent c) {
         Graphics2D g2d = (Graphics2D) g;
-        render.FoxRender.setLowRender(g2d);
+        render.FoxRender.setRender(g2d, FoxRender.RENDER.LOW);
 
         g2d.setPaint(new GradientPaint(0, 0, Color.DARK_GRAY, 0, c.getHeight(),
                 new Color(31, 63, 90)));

@@ -1,5 +1,7 @@
 package render.foxLFui;
 
+import render.FoxRender;
+
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicButtonUI;
@@ -31,7 +33,7 @@ public class MyButtonUI extends BasicButtonUI {
 
     public void paint(Graphics g, JComponent c) {
         Graphics2D g2d = (Graphics2D) g;
-        render.FoxRender.setLowRender(g2d);
+        render.FoxRender.setRender(g2d, FoxRender.RENDER.LOW);
 
         AbstractButton button = (AbstractButton) c;
         ButtonModel buttonModel = button.getModel();

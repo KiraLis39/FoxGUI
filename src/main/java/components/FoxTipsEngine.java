@@ -105,7 +105,7 @@ public class FoxTipsEngine {
 					@Override
 					public void paint(Graphics g) {
 						Graphics2D g2d = (Graphics2D) g;
-						FoxRender.setMedRender(g2d);
+						FoxRender.setRender(g2d, FoxRender.RENDER.MED);
 						g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
 
 						GeneralPath gp = buildForm();
@@ -204,7 +204,7 @@ public class FoxTipsEngine {
 									@Override
 									public void paint(Graphics g) {
 										Graphics2D g2d = (Graphics2D) g;
-										FoxRender.setMedRender(g2d);
+										FoxRender.setRender(g2d, FoxRender.RENDER.MED);
 										g2d.setStroke(new BasicStroke(2f));
 										g2d.setPaint(mouseOver ? over : out);
 										g2d.drawLine(1, 0, getWidth() - 2, 12);
