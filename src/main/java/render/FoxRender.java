@@ -1,5 +1,7 @@
 package render;
 
+import lombok.NonNull;
+
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
@@ -10,7 +12,7 @@ public class FoxRender {
 	
 	private FoxRender() {}
 
-	public static void setRender(Graphics2D g2D, RENDER type) {
+	public static void setRender(Graphics2D g2D, @NonNull RENDER type) {
 		switch (type) {
 			case LOW -> setLowRender(g2D);
 			case MED -> setMedRender(g2D);
