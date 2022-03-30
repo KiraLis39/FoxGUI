@@ -1,4 +1,4 @@
-package fox;
+package utils;
 
 import lombok.Data;
 

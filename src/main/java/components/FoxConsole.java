@@ -1,6 +1,6 @@
 package components;
 
-import fox.InputAction;
+import utils.InputAction;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

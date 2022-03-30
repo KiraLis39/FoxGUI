@@ -1,4 +1,4 @@
-package fox;
+package images;
 
 import lombok.NonNull;
 import render.FoxRender;

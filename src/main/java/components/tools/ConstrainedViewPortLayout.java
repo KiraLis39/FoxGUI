@@ -1,4 +1,4 @@
-package components;
+package components.tools;
 
 import java.awt.Container;
 import java.awt.Dimension;

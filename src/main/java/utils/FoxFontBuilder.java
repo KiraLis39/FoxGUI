@@ -1,5 +1,6 @@
-package fox;
+package utils;
 
+import fox.Out;
 import fox.Out.LEVEL;
 
 import javax.swing.*;

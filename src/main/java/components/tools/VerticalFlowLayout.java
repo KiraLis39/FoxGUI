@@ -1,4 +1,4 @@
-package components;
+package components.tools;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -102,7 +102,7 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
 	 * or <code>VerticalFlowLayout.CENTER</code>,
 	 * 
 	 * @return the alignment value for this layout
-	 * @see java.fox.components.VerticalFlowLayout#setAlignment
+	 * @see components.tools.VerticalFlowLayout#setAlignment
 	 * @since JDK1.1
 	 */
 	public int getAlignment() {
@@ -131,7 +131,7 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
 	 *
 	 * @return the horizontal gap between components and between the components and
 	 *         the borders of the <code>Container</code>
-	 * @see java.fox.components.VerticalFlowLayout#setHgap
+	 * @see components.tools.VerticalFlowLayout#setHgap
 	 * @since JDK1.1
 	 */
 	public int getHgap() {
@@ -144,7 +144,7 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
 	 *
 	 * @param hgap the horizontal gap between components and between the components
 	 *             and the borders of the <code>Container</code>
-	 * @see java.fox.components.VerticalFlowLayout#getHgap
+	 * @see components.tools.VerticalFlowLayout#getHgap
 	 * @since JDK1.1
 	 */
 	public void setHgap(int hgap) {
@@ -157,7 +157,7 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
 	 *
 	 * @return the vertical gap between components and between the components and
 	 *         the borders of the <code>Container</code>
-	 * @see java.fox.components.VerticalFlowLayout#setVgap
+	 * @see components.tools.VerticalFlowLayout#setVgap
 	 * @since JDK1.1
 	 */
 	public int getVgap() {
@@ -170,7 +170,7 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
 	 *
 	 * @param vgap the vertical gap between components and between the components
 	 *             and the borders of the <code>Container</code>
-	 * @see java.fox.components.VerticalFlowLayout#getVgap
+	 * @see components.tools.VerticalFlowLayout#getVgap
 	 */
 	public void setVgap(int vgap) {
 		this.vgap = vgap;

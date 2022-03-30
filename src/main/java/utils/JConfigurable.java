@@ -1,4 +1,4 @@
-package fox.interfaces;
+package utils;
 
 import java.io.Serializable;
 import java.nio.file.Path;
