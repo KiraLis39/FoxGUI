@@ -1,4 +1,4 @@
-package utils;
+package iom.interfaces;
 
 import java.io.Serializable;
 import java.nio.file.Path;

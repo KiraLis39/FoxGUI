@@ -12,7 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
-import utils.JConfigurable;
+import iom.interfaces.JConfigurable;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
