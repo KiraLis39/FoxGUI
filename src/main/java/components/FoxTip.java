@@ -204,12 +204,16 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
         add(contentPanel, BorderLayout.CENTER);
     }
 
-    public void showTip() {
-        pack();
-        setLocation(
-                owner.getLocationOnScreen().x + owner.getWidth() / 2 - getWidth() / 2,
-                owner.getLocationOnScreen().y - getHeight());
-        setVisible(true);
+    public void showTip() throws NullPointerException {
+        try {
+            pack();
+            setLocation(
+                    owner.getLocationOnScreen().x + owner.getWidth() / 2 - getWidth() / 2,
+                    owner.getLocationOnScreen().y - getHeight());
+            setVisible(true);
+        } catch (NullPointerException npe) {
+            throw npe;
+        }
     }
 
     public void close() {
