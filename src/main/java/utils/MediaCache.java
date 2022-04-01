@@ -2,6 +2,7 @@ package utils;
 
 import lombok.NonNull;
 
+import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,12 @@ public class MediaCache {
     public void add(@NonNull String name, @NonNull Object mustCached) {
         map.put(name, mustCached);
 //        memoryControl();
+    }
+
+    public void addIfAbsent(@NonNull String name, @NonNull Object mustCached) {
+        if (!map.containsKey(name)) {
+            map.put(name, mustCached);
+        }
     }
 
     public Object get(@NonNull String resourceName) {
