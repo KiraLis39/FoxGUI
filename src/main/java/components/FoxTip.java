@@ -13,7 +13,6 @@ import java.awt.image.BufferedImage;
 public class FoxTip extends JDialog implements WindowFocusListener, ComponentListener {
     public enum TYPE {INPUT, INFO}
     private TYPE type;
-    private Container owner;
 
     private JPanel contentPanel;
     private JTextField inputField;
@@ -28,14 +27,13 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
     private Color borderColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
 
 
-    public FoxTip(Container owner, TYPE type, BufferedImage icon, String title, String message, String footer) {
-        new FoxTip(owner, type, icon, title, message, footer, baseColor, secondColor, borderColor);
+    public FoxTip(TYPE type, BufferedImage icon, String title, String message, String footer) {
+        new FoxTip(type, icon, title, message, footer, baseColor, secondColor, borderColor);
     }
 
-    public FoxTip(Container owner, TYPE type, BufferedImage icon, String title, String message, String footer,
+    public FoxTip(TYPE type, BufferedImage icon, String title, String message, String footer,
                   Color baseColor, Color secondColor, Color borderColor) {
         this.type = type;
-        this.owner = owner;
         this.baseColor = baseColor;
         this.secondColor = secondColor;
         this.borderColor = borderColor;
@@ -204,7 +202,7 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
         add(contentPanel, BorderLayout.CENTER);
     }
 
-    public void showTip() throws NullPointerException {
+    public void showTip(Container owner) throws NullPointerException {
         try {
             pack();
             setLocation(
