@@ -13,13 +13,13 @@ import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 public class FOptionPane extends JDialog implements ActionListener {
-    public enum TYPE {DEFAULT, YES_NO_TYPE}
+    public enum TYPE {DEFAULT, YES_NO_TYPE, VARIANTS}
     private final TYPE type;
 
     private Thread toThread;
     private JButton OK_BUTTON, NO_BUTTON, YES_BUTTON;
     private BufferedImage ico;
-    private int answer = -1, timeout = 20;
+    private int answer = -1, timeout = 15;
     private JLabel titleLabel;
     private JPanel upLabelPane;
     private String timeLastLabel;
@@ -180,6 +180,28 @@ public class FOptionPane extends JDialog implements ActionListener {
                                     }
                                 };
                                 NO_BUTTON = new JButton("Нет") {
+                                    {
+                                        setActionCommand("no");
+                                        addActionListener(FOptionPane.this);
+                                        setFocusPainted(false);
+                                        setBackground(Color.DARK_GRAY);
+                                        setForeground(Color.WHITE);
+                                    }
+                                };
+                                add(YES_BUTTON);
+                                add(NO_BUTTON);
+                            }
+                            case VARIANTS -> {
+                                YES_BUTTON = new JButton("Выйти из игры") {
+                                    {
+                                        setActionCommand("yes");
+                                        addActionListener(FOptionPane.this);
+                                        setFocusPainted(false);
+                                        setBackground(Color.DARK_GRAY);
+                                        setForeground(Color.WHITE);
+                                    }
+                                };
+                                NO_BUTTON = new JButton("Сохранение и загрузка") {
                                     {
                                         setActionCommand("no");
                                         addActionListener(FOptionPane.this);
