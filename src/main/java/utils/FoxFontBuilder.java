@@ -15,42 +15,10 @@ import java.util.List;
 import java.util.*;
 import java.util.Map.Entry;
 
-
 public class FoxFontBuilder {
-    public enum FONT {
-        COMIC_SANS("Comic Sans MS"),
-        MONOTYPE_CORSIVA("Monotype Corsiva"),
-        BAHNSCHRIFT("bahnschrift"),
-        CANDARA("Candara"),
-        HARLOW_S_I("Harlow Solid Italic"),
-        CORBEL("Corbel"),
-        GEORGIA("Georgia"),
-        ARIAL("Arial"),
-        ARIAL_NARROW("Arial Narrow"),
-        SEGOE_SCRIPT("Segoe Script"),
-        CAMBRIA("Cambria"),
-        CONSTANTIA("Constantia"),
-        CONSOLAS("Consolas"),
-        PAPYRYS("Papyrus"),
-        LEELAWADEE("Leelawadee UI"),
-        SEGOE_UI_SYMBOL("Segoe UI Symbol"),
-        TIMES_NEW_ROMAN("Times New Roman"),
-        COURIER_NEW("Courier New");
-
-        final String value;
-
-        FONT(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
     private static final FONT defaultFont = FONT.ARIAL_NARROW;
-
-    private static GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
     private static final List<String> fArr = new LinkedList<>(); // набор шрифтов по-умолчанию.
+    private static GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
     private static Path fontsDirectory; // папка с дополнительными шрифтами TRUETYPE
 
     static {
@@ -62,7 +30,6 @@ public class FoxFontBuilder {
     private FoxFontBuilder(GraphicsEnvironment _gEnv) {
         gEnv = _gEnv;
     }
-
 
     // выбор шрифта:
     public static Font setFoxFont(FONT fontName, float fontSize, Boolean isBold) {
@@ -89,8 +56,7 @@ public class FoxFontBuilder {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
-            if (fontsDirectory != null) {
+            } else {
                 // если в ОС нет шрифта, но указана папка c ним:
                 try {
                     log("Now will be setup fonts...");
@@ -133,14 +99,6 @@ public class FoxFontBuilder {
         return false;
     }
 
-//    public static Double getStringHeight(Graphics gr, String string) {
-//        return getStringBounds(gr, string).getHeight();
-//    }
-//
-//    public static Double getStringWidth(Graphics gr, String string) {
-//        return getStringBounds(gr, string).getWidth();
-//    }
-
     public static Double getStringCenterX(Graphics gr, String string) {
         return getStringBounds(gr, string).getCenterX();
     }
@@ -152,7 +110,6 @@ public class FoxFontBuilder {
     public static Rectangle2D getStringBounds(Graphics gr, String string) {
         return gr.getFontMetrics(gr.getFont()).getStringBounds(string, gr);
     }
-
 
     public static int addNewFont(String newFontName) {
         fArr.add(newFontName);
@@ -206,7 +163,6 @@ public class FoxFontBuilder {
         fontsDirectory = _fontsDirectory;
     }
 
-
     public static Font[] getAvailableFonts() {
         return GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
     }
@@ -233,5 +189,36 @@ public class FoxFontBuilder {
 
     private static void log(String message) {
         Out.Print(FoxFontBuilder.class, LEVEL.DEBUG, message);
+    }
+
+    public enum FONT {
+        COMIC_SANS("Comic Sans MS"),
+        MONOTYPE_CORSIVA("Monotype Corsiva"),
+        BAHNSCHRIFT("bahnschrift"),
+        CANDARA("Candara"),
+        HARLOW_S_I("Harlow Solid Italic"),
+        CORBEL("Corbel"),
+        GEORGIA("Georgia"),
+        ARIAL("Arial"),
+        ARIAL_NARROW("Arial Narrow"),
+        SEGOE_SCRIPT("Segoe Script"),
+        CAMBRIA("Cambria"),
+        CONSTANTIA("Constantia"),
+        CONSOLAS("Consolas"),
+        PAPYRYS("Papyrus"),
+        LEELAWADEE("Leelawadee UI"),
+        SEGOE_UI_SYMBOL("Segoe UI Symbol"),
+        TIMES_NEW_ROMAN("Times New Roman"),
+        COURIER_NEW("Courier New");
+
+        final String value;
+
+        FONT(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 }
