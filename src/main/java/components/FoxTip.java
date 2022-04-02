@@ -11,6 +11,8 @@ import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 
 public class FoxTip extends JDialog implements WindowFocusListener, ComponentListener {
+    private final JComponent owner;
+
     public enum TYPE {INPUT, INFO}
     private TYPE type;
 
@@ -22,18 +24,19 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
     private float opacity = 0.1f;
     private final float MAX_OPAQUE = 0.9f;
 
-    private Color baseColor = new Color(1.0f, 1.0f, 1.0f, 0.2f);
-    private Color secondColor = new Color(0.25f, 0.25f, 0.35f, 0.9f);
-    private Color borderColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+    private static Color baseColor = new Color(1.0f, 1.0f, 1.0f, 0.2f);
+    private static Color secondColor = new Color(0.25f, 0.25f, 0.35f, 0.9f);
+    private static Color borderColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
 
 
-    public FoxTip(TYPE type, BufferedImage icon, String title, String message, String footer) {
-        new FoxTip(type, icon, title, message, footer, baseColor, secondColor, borderColor);
+    public FoxTip(TYPE type, BufferedImage icon, String title, String message, String footer, JComponent owner) {
+        this(type, icon, title, message, footer, baseColor, secondColor, borderColor, owner);
     }
 
     public FoxTip(TYPE type, BufferedImage icon, String title, String message, String footer,
-                  Color baseColor, Color secondColor, Color borderColor) {
+                  Color baseColor, Color secondColor, Color borderColor, JComponent owner) {
         this.type = type;
+        this.owner = owner;
         this.baseColor = baseColor;
         this.secondColor = secondColor;
         this.borderColor = borderColor;
@@ -202,7 +205,7 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
         add(contentPanel, BorderLayout.CENTER);
     }
 
-    public void showTip(Container owner) throws NullPointerException {
+    public void showTip() throws NullPointerException {
         try {
             pack();
             setLocation(
