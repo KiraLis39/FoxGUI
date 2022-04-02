@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 public class FOptionPane extends JDialog implements ActionListener {
-    public enum TYPE {DEFAULT, YES_NO_TYPE, VARIANTS}
+    public enum TYPE {DEFAULT, YES_NO_TYPE, VARIANTS, INPUT}
     private final TYPE type;
 
     private Thread toThread;
@@ -21,6 +21,7 @@ public class FOptionPane extends JDialog implements ActionListener {
     private BufferedImage ico;
     private int answer = -1, timeout = 15;
     private JLabel titleLabel;
+    private JTextField inputField;
     private JPanel upLabelPane;
     private String timeLastLabel;
 
@@ -122,28 +123,51 @@ public class FOptionPane extends JDialog implements ActionListener {
                                 setOpaque(false);
                                 setBorder(new EmptyBorder(16, 6, 0, 0));
 
-                                JTextArea mesArea = new JTextArea() {
-                                    {
-                                        setOpaque(false);
-                                        setEditable(false);
-                                        setForeground(Color.WHITE);
-                                        setText(message);
-                                        setWrapStyleWord(true);
-                                        setLineWrap(true);
-                                        setBorder(null);
-                                    }
-                                };
+                                if (type == TYPE.INPUT) {
+                                    JPanel inputPane = new JPanel(new GridLayout(3,1,0,0)) {
+                                        {
+                                            setOpaque(false);
+                                            setBorder(new EmptyBorder(0,0,0,9));
 
-                                JScrollPane mesScroll = new JScrollPane(mesArea) {
-                                    {
-                                        setOpaque(false);
-                                        getViewport().setOpaque(false);
-                                        setBorder(null);
-                                        getViewport().setBorder(null);
-                                    }
-                                };
+                                            inputField = new JTextField() {
+                                                {
 
-                                add(mesScroll);
+                                                }
+                                            };
+                                            add(new JLabel(message) {
+                                                {
+                                                    setForeground(Color.WHITE);
+                                                }
+                                            });
+                                            add(inputField);
+                                        }
+                                    };
+
+                                    add(inputPane, BorderLayout.CENTER);
+                                } else {
+                                    JTextArea mesArea = new JTextArea() {
+                                        {
+                                            setOpaque(false);
+                                            setForeground(Color.WHITE);
+                                            setEditable(false);
+                                            setText(message);
+                                            setWrapStyleWord(true);
+                                            setLineWrap(true);
+                                            setBorder(null);
+                                        }
+                                    };
+
+                                    JScrollPane mesScroll = new JScrollPane(mesArea) {
+                                        {
+                                            setOpaque(false);
+                                            getViewport().setOpaque(false);
+                                            setBorder(null);
+                                            getViewport().setBorder(null);
+                                        }
+                                    };
+
+                                    add(mesScroll);
+                                }
                             }
                         };
 
@@ -157,7 +181,7 @@ public class FOptionPane extends JDialog implements ActionListener {
                         setOpaque(false);
 
                         switch (FOptionPane.this.type) {
-                            case DEFAULT -> {
+                            case INPUT,DEFAULT -> {
                                 OK_BUTTON = new JButton("OK") {
                                     {
                                         setActionCommand("ok");
@@ -227,6 +251,9 @@ public class FOptionPane extends JDialog implements ActionListener {
 
         add(basePane);
 
+        pack();
+        setLocationRelativeTo(null);
+
         toThread = new Thread(() -> {
             while (timeout > 0) {
                 timeout--;
@@ -241,9 +268,6 @@ public class FOptionPane extends JDialog implements ActionListener {
             FOptionPane.this.dispose();
         });
         toThread.start();
-
-        pack();
-        setLocationRelativeTo(null);
 
         setModal(isModal);
         setModalityType(ModalityType.APPLICATION_MODAL);
@@ -261,10 +285,14 @@ public class FOptionPane extends JDialog implements ActionListener {
         g2D.drawRect(1, 1, getWidth() - 2, getHeight() - 2);
     }
 
-    public int get() {
-        int result = answer;
+    public Object get() {
+        Object result = answer;
         timeout = 0;
-        return result;
+        if (type == TYPE.INPUT) {
+            return inputField.getText();
+        } else {
+            return result;
+        }
     }
 
     @Override
