@@ -1,6 +1,7 @@
 package components;
 
 import utils.FoxFontBuilder;
+import utils.InputAction;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -8,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
@@ -251,6 +253,14 @@ public class FOptionPane extends JDialog implements ActionListener {
 
         add(basePane);
 
+        InputAction.add("foxPane", this);
+        InputAction.set("foxPane", "abort", KeyEvent.VK_ESCAPE, 0, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                timeout = 0;
+            }
+        });
+
         pack();
         setLocationRelativeTo(null);
 
@@ -260,11 +270,12 @@ public class FOptionPane extends JDialog implements ActionListener {
                 timeLastLabel = "Осталось: " + timeout + " сек.";
                 upLabelPane.repaint();
                 try {
-                    TimeUnit.MILLISECONDS.sleep(1000);
-                } catch (InterruptedException ignore) {
-                }
+                    TimeUnit.MILLISECONDS.sleep(500);
+                    if (timeout == 0) {break;} // повышение отзывчивости.
+                    TimeUnit.MILLISECONDS.sleep(500);
+                } catch (InterruptedException ignore) {}
             }
-            answer = 1;
+            answer = -1;
             FOptionPane.this.dispose();
         });
         toThread.start();
