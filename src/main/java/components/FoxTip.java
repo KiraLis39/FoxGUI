@@ -77,18 +77,37 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
 
             private GeneralPath buildForm() {
                 GeneralPath gp = new GeneralPath(Path2D.WIND_EVEN_ODD);
-                gp.moveTo(5, 5);
-                gp.quadTo(5, 0, 10, 0);
-                gp.lineTo(getWidth() - 11, 0);
-                gp.quadTo(getWidth() - 6, 0, getWidth() - 6, 5);
-                gp.lineTo(getWidth() - 6, getHeight() - 16);
-                gp.quadTo(getWidth() - 6, getHeight() - 11, getWidth() - 11, getHeight() - 11);
-                gp.lineTo(getWidth() / 2 + 10, getHeight() - 11);
-                gp.lineTo(getWidth() / 2, getHeight() - 1);
-                gp.lineTo(getWidth() / 2 - 10, getHeight() - 11);
-                gp.lineTo(10, getHeight() - 11);
-                gp.quadTo(5, getHeight() - 11, 5, getHeight() - 16);
-                gp.lineTo(5, 5);
+                if (owner.getLocation().y <= getHeight()) {
+                    gp.moveTo(5, 5);
+                    gp.quadTo(5, 0, 10, 0);
+                    gp.lineTo(getWidth() / 2 - 10, 0);
+
+                    gp.lineTo(getWidth() / 2, -11);
+                    gp.lineTo(getWidth() / 2 + 10, 0);
+
+                    gp.lineTo(getWidth() - 12, 0);
+                    gp.quadTo(getWidth() - 6, 0, getWidth() - 6, 5);
+                    gp.lineTo(getWidth() - 6, getHeight() - 16);
+                    gp.quadTo(getWidth() - 6, getHeight() - 11, getWidth() - 11, getHeight() - 11);
+                    gp.lineTo(10, getHeight() - 11);
+                    gp.quadTo(5, getHeight() - 11, 5, getHeight() - 16);
+                    gp.lineTo(5, 5);
+                } else {
+                    gp.moveTo(5, 5);
+                    gp.quadTo(5, 0, 10, 0);
+                    gp.lineTo(getWidth() - 11, 0);
+                    gp.quadTo(getWidth() - 6, 0, getWidth() - 6, 5);
+                    gp.lineTo(getWidth() - 6, getHeight() - 16);
+                    gp.quadTo(getWidth() - 6, getHeight() - 11, getWidth() - 11, getHeight() - 11);
+                    gp.lineTo(getWidth() / 2 + 10, getHeight() - 11);
+
+                    gp.lineTo(getWidth() / 2, getHeight() - 1);
+                    gp.lineTo(getWidth() / 2 - 10, getHeight() - 11);
+
+                    gp.lineTo(10, getHeight() - 11);
+                    gp.quadTo(5, getHeight() - 11, 5, getHeight() - 16);
+                    gp.lineTo(5, 5);
+                }
                 return gp;
             }
 
@@ -208,9 +227,17 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
     public void showTip() throws NullPointerException {
         try {
             pack();
-            setLocation(
-                    owner.getLocationOnScreen().x + owner.getWidth() / 2 - getWidth() / 2,
-                    owner.getLocationOnScreen().y - getHeight());
+
+            if (owner.getLocation().y <= getHeight()) {
+                setLocation(
+                        owner.getLocationOnScreen().x + owner.getWidth() / 2 - getWidth() / 2,
+                        owner.getLocationOnScreen().y + owner.getHeight());
+            } else {
+                setLocation(
+                        owner.getLocationOnScreen().x + owner.getWidth() / 2 - getWidth() / 2,
+                        owner.getLocationOnScreen().y - getHeight());
+            }
+
             setVisible(true);
         } catch (NullPointerException npe) {
             throw npe;
