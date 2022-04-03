@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 public class FOptionPane extends JDialog implements ActionListener {
-    public enum TYPE {DEFAULT, YES_NO_TYPE, VARIANTS, INPUT}
+    public enum TYPE {INFO, YES_NO_TYPE, VARIANTS, INPUT}
     private final TYPE type;
 
     private Thread toThread;
@@ -40,7 +40,7 @@ public class FOptionPane extends JDialog implements ActionListener {
     }
 
     public FOptionPane(String title, String message, TYPE type, BufferedImage _ico, boolean isModal) {
-        this.type = type == null ? TYPE.DEFAULT : type;
+        this.type = type == null ? TYPE.INFO : type;
         if (ico != null) {
             this.ico = _ico;
         } else {
@@ -183,7 +183,7 @@ public class FOptionPane extends JDialog implements ActionListener {
                         setOpaque(false);
 
                         switch (FOptionPane.this.type) {
-                            case INPUT,DEFAULT -> {
+                            case INPUT,INFO -> {
                                 OK_BUTTON = new JButton("OK") {
                                     {
                                         setActionCommand("ok");
