@@ -7,15 +7,14 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import fox.Out;
+import iom.interfaces.JConfigurable;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
-import iom.interfaces.JConfigurable;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -45,7 +44,7 @@ public class JIOM {
         };
     }
 
-    public static <T extends JConfigurable> T fileToDto(final Path dtoPath, Class<T> clazz) throws IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public static <T extends JConfigurable> T fileToDto(final Path dtoPath, Class<T> clazz) throws Exception {
         if (objectMapper == null) {
             init();
         }
