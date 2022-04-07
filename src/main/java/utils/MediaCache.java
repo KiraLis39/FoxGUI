@@ -6,29 +6,24 @@ import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MediaCache {
-    private final static Map<String, Object> map = Collections.synchronizedMap(new HashMap<>());
+    private final static ConcurrentHashMap<String, Object> map = new ConcurrentHashMap<>();
     private static MediaCache cache;
 //    private static long USED_MEMORY, MAX_LOAD_ALLOWED;
 //    private final long MAX_MEMORY = Runtime.getRuntime().maxMemory() - 1L;
 //    private final int MIN_CASH_SIZE_TO_CLEARING = 128;
 //    private final float memGCTrigger = 0.75f;
+//    ImageIO.setUseCache(false);
 
-
-    private MediaCache() {
-    } // ImageIO.setUseCache(false);
+    private MediaCache() {}
 
     public static MediaCache getInstance() {
         if (cache == null) {
             cache = new MediaCache();
         }
         return cache;
-    }
-
-    public void add(@NonNull String name, @NonNull Object mustCached) {
-        map.put(name, mustCached);
-//        memoryControl();
     }
 
     public void addIfAbsent(@NonNull String name, @NonNull Object mustCached) {

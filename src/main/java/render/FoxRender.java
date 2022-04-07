@@ -12,16 +12,16 @@ public class FoxRender {
 	
 	private FoxRender() {}
 
-	public static void setRender(Graphics2D g2D, @NonNull RENDER type) {
+	public synchronized static void setRender(@NonNull Graphics2D g2D, @NonNull RENDER type) {
 		switch (type) {
 			case LOW -> setLowRender(g2D);
-			case MED -> setMedRender(g2D);
+			default -> setMedRender(g2D);
 			case HIGH -> setHQRender(g2D);
 			case ULTRA -> setUltraRender(g2D);
 		}
 	}
 
-	private static void setLowRender(Graphics2D g2D) {
+	private static void setLowRender(@NonNull Graphics2D g2D) {
 		g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g2D.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
 		g2D.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
@@ -31,7 +31,7 @@ public class FoxRender {
 		g2D.setRenderingHint(RenderingHints.KEY_RESOLUTION_VARIANT, RenderingHints.VALUE_RESOLUTION_VARIANT_BASE);
 	}
 
-	private static void setMedRender(Graphics2D g2D) {
+	private static void setMedRender(@NonNull Graphics2D g2D) {
 		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2D.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
 		g2D.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
@@ -42,7 +42,7 @@ public class FoxRender {
 //		g2D.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
 	}
 
-	private static void setHQRender(Graphics2D g2D) {
+	private static void setHQRender(@NonNull Graphics2D g2D) {
 		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2D.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2D.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
@@ -56,7 +56,7 @@ public class FoxRender {
 //		g2D.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
 	}
 
-	private static void setUltraRender(Graphics2D g2D) {
+	private static void setUltraRender(@NonNull Graphics2D g2D) {
 		g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2D.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 		g2D.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
