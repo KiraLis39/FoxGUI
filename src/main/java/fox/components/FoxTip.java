@@ -1,9 +1,8 @@
-package components;
+package fox.components;
 
+import fox.render.FoxRender;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import render.FoxRender;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -14,7 +13,6 @@ import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 
 @Slf4j
-@Component
 @AllArgsConstructor
 public final class FoxTip extends JDialog implements WindowFocusListener, ComponentListener {
     private static final float MAX_OPAQUE = 0.9f;

@@ -1,10 +1,9 @@
-package components;
+package fox.components;
 
+import fox.utils.FoxFontBuilder;
+import fox.utils.InputAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import utils.FoxFontBuilder;
-import utils.InputAction;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -18,7 +17,6 @@ import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class FOptionPane extends JDialog implements ActionListener {
     private final InputAction inputAction;

@@ -1,4 +1,4 @@
-package components.tools;
+package fox.components.tools;
 
 import javax.swing.*;
 import java.awt.*;

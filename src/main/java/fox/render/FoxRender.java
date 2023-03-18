@@ -1,11 +1,9 @@
-package render;
+package fox.render;
 
 import lombok.NonNull;
-import org.springframework.stereotype.Component;
 
 import java.awt.*;
 
-@Component
 public final class FoxRender {
 //	image.getScaledInstance(1024, 768, 2);
 //	g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.0f));

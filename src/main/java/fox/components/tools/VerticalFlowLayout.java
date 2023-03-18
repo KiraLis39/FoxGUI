@@ -1,21 +1,21 @@
-package components.tools;
+package fox.components.tools;
 
 import java.awt.*;
 import java.io.Serializable;
 
 public class VerticalFlowLayout implements LayoutManager, Serializable {
     /**
-     * This value indicates that each row of components should be left-justified.
+     * This value indicates that each row of fox.components should be left-justified.
      */
     public static final int TOP = 0;
 
     /**
-     * This value indicates that each row of components should be centered.
+     * This value indicates that each row of fox.components should be centered.
      */
     public static final int CENTER = 1;
 
     /**
-     * This value indicates that each row of components should be right-justified.
+     * This value indicates that each row of fox.components should be right-justified.
      */
     public static final int BOTTOM = 2;
 
@@ -32,9 +32,9 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
     int align; // This is the one we actually use
 
     /**
-     * The flow layout manager allows a seperation of components with gaps. The
-     * horizontal gap will specify the space between components and between the
-     * components and the borders of the <code>Container</code>.
+     * The flow layout manager allows a seperation of fox.components with gaps. The
+     * horizontal gap will specify the space between fox.components and between the
+     * fox.components and the borders of the <code>Container</code>.
      *
      * @see #getHgap()
      * @see #setHgap(int)
@@ -42,7 +42,7 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
     int hgap;
 
     /**
-     * The flow layout manager allows a seperation of components with gaps. The
+     * The flow layout manager allows a seperation of fox.components with gaps. The
      * vertical gap will specify the space between rows and between the the rows and
      * the borders of the <code>Container</code>.
      *
@@ -81,9 +81,9 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
      * or <code>VerticalFlowLayout.CENTER</code>.
      *
      * @param align the alignment value
-     * @param hgap  the horizontal gap between components and between the components
+     * @param hgap  the horizontal gap between fox.components and between the fox.components
      *              and the borders of the <code>Container</code>
-     * @param vgap  the vertical gap between components and between the components
+     * @param vgap  the vertical gap between fox.components and between the fox.components
      *              and the borders of the <code>Container</code>
      */
     public VerticalFlowLayout(int align, int hgap, int vgap) {
@@ -98,7 +98,7 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
      * or <code>VerticalFlowLayout.CENTER</code>,
      *
      * @return the alignment value for this layout
-     * @see components.tools.VerticalFlowLayout#setAlignment
+     * @see fox.components.tools.VerticalFlowLayout#setAlignment
      * @since JDK1.1
      */
     public int getAlignment() {
@@ -122,12 +122,12 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
     }
 
     /**
-     * Gets the horizontal gap between components and between the components and the
+     * Gets the horizontal gap between fox.components and between the fox.components and the
      * borders of the <code>Container</code>
      *
-     * @return the horizontal gap between components and between the components and
+     * @return the horizontal gap between fox.components and between the fox.components and
      * the borders of the <code>Container</code>
-     * @see components.tools.VerticalFlowLayout#setHgap
+     * @see fox.components.tools.VerticalFlowLayout#setHgap
      * @since JDK1.1
      */
     public int getHgap() {
@@ -135,12 +135,12 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
     }
 
     /**
-     * Sets the horizontal gap between components and between the components and the
+     * Sets the horizontal gap between fox.components and between the fox.components and the
      * borders of the <code>Container</code>.
      *
-     * @param hgap the horizontal gap between components and between the components
+     * @param hgap the horizontal gap between fox.components and between the fox.components
      *             and the borders of the <code>Container</code>
-     * @see components.tools.VerticalFlowLayout#getHgap
+     * @see fox.components.tools.VerticalFlowLayout#getHgap
      * @since JDK1.1
      */
     public void setHgap(int hgap) {
@@ -148,12 +148,12 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
     }
 
     /**
-     * Gets the vertical gap between components and between the components and the
+     * Gets the vertical gap between fox.components and between the fox.components and the
      * borders of the <code>Container</code>.
      *
-     * @return the vertical gap between components and between the components and
+     * @return the vertical gap between fox.components and between the fox.components and
      * the borders of the <code>Container</code>
-     * @see components.tools.VerticalFlowLayout#setVgap
+     * @see fox.components.tools.VerticalFlowLayout#setVgap
      * @since JDK1.1
      */
     public int getVgap() {
@@ -161,12 +161,12 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
     }
 
     /**
-     * Sets the vertical gap between components and between the components and the
+     * Sets the vertical gap between fox.components and between the fox.components and the
      * borders of the <code>Container</code>.
      *
-     * @param vgap the vertical gap between components and between the components
+     * @param vgap the vertical gap between fox.components and between the fox.components
      *             and the borders of the <code>Container</code>
-     * @see components.tools.VerticalFlowLayout#getVgap
+     * @see fox.components.tools.VerticalFlowLayout#getVgap
      */
     public void setVgap(int vgap) {
         this.vgap = vgap;
@@ -190,7 +190,7 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
 
     /**
      * Returns the preferred dimensions for this layout given the <i>visible</i>
-     * components in the specified target container.
+     * fox.components in the specified target container.
      *
      * @param target the container that needs to be laid out
      * @return the preferred dimensions to lay out the subcomponents of the
@@ -230,7 +230,7 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
     }
 
     /**
-     * Returns the minimum dimensions needed to layout the <i>visible</i> components
+     * Returns the minimum dimensions needed to layout the <i>visible</i> fox.components
      * contained in the specified target container.
      *
      * @param target the container that needs to be laid out
@@ -271,7 +271,7 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
 
     /**
      * Lays out the container. This method lets each <i>visible</i> component take
-     * its preferred size by reshaping the components in the target container in
+     * its preferred size by reshaping the fox.components in the target container in
      * order to satisfy the alignment of this <code>VerticalFlowLayout</code>
      * object.
      *

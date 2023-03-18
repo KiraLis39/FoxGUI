@@ -1,13 +1,11 @@
-package images;
+package fox.images;
 
 import lombok.NonNull;
-import org.springframework.stereotype.Component;
 
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Component
 public final class FoxSpritesCombiner {
     private final Map<String, BufferedImage[]> spritesMap = new LinkedHashMap<>();
 

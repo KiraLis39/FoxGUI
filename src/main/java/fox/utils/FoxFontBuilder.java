@@ -1,9 +1,6 @@
-package utils;
+package fox.utils;
 
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,24 +15,17 @@ import java.util.*;
 import java.util.Map.Entry;
 
 @Slf4j
-@Component
-@RequiredArgsConstructor
-public class FoxFontBuilder {
+public final class FoxFontBuilder {
     private final FONT defaultFont = FONT.ARIAL_NARROW;
-    private final GraphicsEnvironment gEnv; // = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    private final GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
     private final List<String> fArr = new LinkedList<>(); // набор шрифтов по-умолчанию.
     private Path fontsDirectory; // папка с дополнительными шрифтами TRUETYPE
 
-    @PostConstruct
-    private void buildFarr() {
+    public FoxFontBuilder() {
         for (FONT value : FONT.values()) {
             fArr.add(value.getValue());
         }
     }
-
-//    private FoxFontBuilder(GraphicsEnvironment _gEnv) {
-//        gEnv = _gEnv;
-//    }
 
     // выбор шрифта:
     public Font setFoxFont(FONT fontName, float fontSize, Boolean isBold) {

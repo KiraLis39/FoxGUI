@@ -1,101 +1,81 @@
-package components;
+package fox.components;
 
-import lombok.Data;
+import fox.utils.FoxFontBuilder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import utils.InputAction;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.text.SimpleDateFormat;
+import java.util.Objects;
 
-@Data
-@Slf4j
-@Component
 @RequiredArgsConstructor
-public class FoxConsole extends JDialog {
+public class FoxConsole2 extends JDialog implements KeyListener {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-    private final InputAction inputAction;
+    private final FoxFontBuilder fontBuilder = new FoxFontBuilder();
 
+    private FoxConsole2 consoleFrame;
+    private KeyListener kList;
     private JFrame parentFrame;
-    private JPanel upTactAndClockPane, foxConsolePanel;
+    private JPanel upTactAndClockPane;
     private JScrollPane consoleScroll;
     private JTextArea consoleArea;
     private JTextField inputArea;
     private JLabel oClock;
-    private Font f0, f1, f2;
-    private boolean clockIsOn = false;
+    private Boolean clockIsOn = false;
 
-
-    public void buildFoxConsole(JFrame parent) {
-        buildFoxConsole(parent, "Console", true);
+    public FoxConsole2(JFrame parent, String consoleTitle, Boolean isModal) {
+        this(parent, consoleTitle, isModal, null);
     }
 
-    public void buildFoxConsole(JFrame parent, String consoleTitle, boolean isModal) {
-//        super(parent);
-        setTitle(consoleTitle);
-        setModal(isModal);
-        this.parentFrame = parent;
+    public FoxConsole2(JFrame parent, String consoleTitle, Boolean isModal, KeyListener _kList) {
+        super(parent, consoleTitle, isModal);
+
+        try {
+            UIManager.setLookAndFeel(new NimbusLookAndFeel());
+        } catch (Exception e) {
+            System.err.println("Couldn't get specified look and feel, for some reason.");
+        }
+
+        consoleFrame = this;
+        parentFrame = parent;
+
+        kList = Objects.requireNonNullElse(_kList, this);
 
         setLayout(new BorderLayout());
         setModalExclusionType(Dialog.ModalExclusionType.NO_EXCLUDE);
         setUndecorated(true);
         setVisible(false);
 
+        JComponent testFrameComponent = (JComponent) parentFrame.getContentPane();
+        testFrameComponent.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_BACK_QUOTE, 0),
+                "onoff"
+        );
+        testFrameComponent.getActionMap().put("onoff", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println(">> " + e.getID() + " - " + e.getModifiers());
+                visibleChanger();
+            }
+        });
+
         createNewConsole();
-
-        inAc();
     }
 
-    private void inAc() {
-        inputAction.add("console", FoxConsole.this);
-        inputAction.set("console", "onOff", KeyEvent.VK_BACK_QUOTE, 0, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                visibleChanger();
-            }
-        });
-
-        inputAction.add("parent", parentFrame);
-        inputAction.set("parent", "onOff", KeyEvent.VK_BACK_QUOTE, 0, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                visibleChanger();
-            }
-        });
-
-        inputAction.add("inputArea", inputArea);
-        inputAction.set("inputArea", "send", KeyEvent.VK_ENTER, 0, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!inputArea.getText().isEmpty()) {
-                    consoleArea.append("\n" + inputArea.getText());
-                    consoleArea.setText(consoleArea.getText().trim());
-                    consoleArea.setCaretPosition(consoleArea.getText().length());
-
-                    inputArea.setText("");
-                    inputArea.requestFocus();
-                }
-            }
-        });
-    }
-
-    void visibleChanger() {
+    private void visibleChanger() {
         oClock.setText("" + dateFormat.format(System.currentTimeMillis()));
 
-        setSize(new Dimension(parentFrame.getWidth(), parentFrame.getHeight() / 3 * 2));
-        setLocation(parentFrame.getX(), parentFrame.getY());
-        setVisible(!isVisible());
+        consoleFrame.setSize(new Dimension(parentFrame.getWidth(), parentFrame.getHeight() / 3 * 2));
+        consoleFrame.setLocation(parentFrame.getX(), parentFrame.getY());
+
+        consoleFrame.setVisible(!consoleFrame.isVisible());
     }
 
     private void createNewConsole() {
-        setOpacity(0.85f);
+        consoleFrame.setOpacity(0.85f);
 
         upTactAndClockPane = new JPanel() {
             {
@@ -106,9 +86,7 @@ public class FoxConsole extends JDialog {
 
         oClock = new JLabel();
         oClock.setText("" + dateFormat.format(System.currentTimeMillis()));
-        if (f0 != null) {
-            oClock.setFont(f0);
-        }
+        oClock.setFont(fontBuilder.setFoxFont(FoxFontBuilder.FONT.ARIAL_NARROW, 14, false));
         oClock.setForeground(Color.GRAY.brighter());
 
         upTactAndClockPane.add(oClock);
@@ -120,9 +98,7 @@ public class FoxConsole extends JDialog {
             {
                 setBackground(Color.BLACK);
                 setForeground(Color.GREEN);
-                if (f1 != null) {
-                    setFont(f1);
-                }
+                setFont(fontBuilder.setFoxFont(FoxFontBuilder.FONT.ARIAL_NARROW, 14, false));
                 setBorder(new EmptyBorder(5, 5, 5, 5));
                 setEditable(false);
                 setFocusable(true);
@@ -144,17 +120,17 @@ public class FoxConsole extends JDialog {
             {
                 setBackground(Color.BLACK);
                 setForeground(Color.ORANGE);
-                if (f2 != null) {
-                    setFont(f2);
-                }
+                setFont(fontBuilder.setFoxFont(FoxFontBuilder.FONT.ARIAL_NARROW, 14, false));
                 setBorder(new EmptyBorder(5, 5, 5, 5));
                 setEditable(true);
                 setFocusable(true);
                 setAutoRequestFocus(true);
+
+                addKeyListener(kList);
             }
         };
 
-        foxConsolePanel = new JPanel(new BorderLayout()) {
+        JPanel foxConsolePanel = new JPanel(new BorderLayout()) {
             {
                 setBackground(new Color(0.0f, 0.0f, 0.0f, 0.5f));
                 setForeground(Color.GREEN);
@@ -171,19 +147,19 @@ public class FoxConsole extends JDialog {
                         inputArea.grabFocus();
                         oClock.setText("" + dateFormat.format(System.currentTimeMillis()));
                     }
+
+                    public void mouseExited(MouseEvent e) {
+                    }
                 });
             }
         };
 
-        add(foxConsolePanel);
+        consoleFrame.add(foxConsolePanel);
 
-        setMinimumSize(new Dimension(parentFrame.getWidth() / 2, parentFrame.getHeight() / 3 * 2));
-        setLocation(parentFrame.getX(), parentFrame.getY());
+        consoleFrame.setMinimumSize(new Dimension(parentFrame.getWidth() / 2, parentFrame.getHeight() / 3 * 2));
+        consoleFrame.setLocation(parentFrame.getX(), parentFrame.getY());
     }
 
-    public void setClockVisible(Boolean onOff) {
-        upTactAndClockPane.setVisible(onOff);
-    }
 
     public void setTextareaBackgroundColor(Color color) {
         consoleArea.setBackground(color);
@@ -201,8 +177,16 @@ public class FoxConsole extends JDialog {
         inputArea.setForeground(color);
     }
 
+    public void setClockPanelVisible(Boolean visible) {
+        upTactAndClockPane.setVisible(visible);
+    }
+
     public void setConsoleClockText(String time) {
         oClock.setText(time);
+    }
+
+    public void setClockIsOn(Boolean clockIsOn) {
+        this.clockIsOn = clockIsOn;
     }
 
     public void setConsoleClockFont(Font font) {
@@ -243,15 +227,38 @@ public class FoxConsole extends JDialog {
         inputArea.requestFocus();
     }
 
-    public void setClockFont(Font f0) {
-        this.f0 = f0;
+    @Override
+    public void keyPressed(KeyEvent key) {
+        if (key.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (!inputArea.getText().isEmpty()) {
+                consoleArea.append("\n" + inputArea.getText());
+                consoleArea.setText(consoleArea.getText().trim());
+                consoleArea.setCaretPosition(consoleArea.getText().length());
+
+                inputArea.setText("");
+                inputArea.requestFocus();
+            }
+        }
     }
 
-    public void setOutputAreaFont(Font f1) {
-        this.f1 = f1;
+    @Override
+    public void keyReleased(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_BACK_QUOTE) {
+            if (consoleFrame.isVisible()) {
+                consoleFrame.dispose();
+            } else {
+                setFocusInArea();
+            }
+        }
     }
 
-    public void setInputAreaFont(Font f2) {
-        this.f2 = f2;
+    public void keyTyped(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_BACK_QUOTE) {
+            if (consoleFrame.isVisible()) {
+                consoleFrame.dispose();
+            } else {
+                setFocusInArea();
+            }
+        }
     }
 }

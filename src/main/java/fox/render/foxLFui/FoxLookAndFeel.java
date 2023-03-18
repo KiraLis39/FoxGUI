@@ -1,4 +1,4 @@
-package render.foxLFui;
+package fox.render.foxLFui;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicLookAndFeel;
@@ -87,7 +87,7 @@ public final class FoxLookAndFeel extends BasicLookAndFeel {
 //        table.put ( "TabbedPaneUI", ... );
 //        table.put ( "SplitPaneUI", ... );
 //
-//        // Complex components
+//        // Complex fox.components
 //        table.put ( "ProgressBarUI", ... );
 //        table.put ( "SliderUI", ... );
 //        table.put ( "SpinnerUI", ... );

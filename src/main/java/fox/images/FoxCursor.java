@@ -1,4 +1,4 @@
-package images;
+package fox.images;
 
 import lombok.NonNull;
 

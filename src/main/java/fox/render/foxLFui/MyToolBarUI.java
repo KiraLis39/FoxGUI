@@ -1,6 +1,6 @@
-package render.foxLFui;
+package fox.render.foxLFui;
 
-import render.FoxRender;
+import fox.render.FoxRender;
 
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;

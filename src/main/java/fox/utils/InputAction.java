@@ -1,7 +1,6 @@
-package utils;
+package fox.utils;
 
 import lombok.Data;
-import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +11,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 @Data
-@Component
 public final class InputAction {
     private final Map<String, JComponent> compMap = new LinkedHashMap<>();
     private FOCUS_TYPE focusType = FOCUS_TYPE.WHEN_IN_FOCUSED_WINDOW;
