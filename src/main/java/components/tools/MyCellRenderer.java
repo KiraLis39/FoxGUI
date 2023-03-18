@@ -12,7 +12,7 @@ public class MyCellRenderer extends JPanel implements ListCellRenderer<JButton> 
         setLayout(new BorderLayout());
         setBackground(Color.DARK_GRAY);
 
-        //                setFont(registry.Registry.trackSelectedFont);
+        // setFont(registry.Registry.trackSelectedFont);
         JButton label = new JButton() {
             {
                 setHorizontalTextPosition(JButton.RIGHT);
