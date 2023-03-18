@@ -1,15 +1,17 @@
 package images;
 
 import lombok.NonNull;
+import org.springframework.stereotype.Component;
 
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Component
 public final class FoxSpritesCombiner {
-    private final static Map<String, BufferedImage[]> spritesMap = new LinkedHashMap<>();
+    private final Map<String, BufferedImage[]> spritesMap = new LinkedHashMap<>();
 
-    public static BufferedImage[] getSprites(@NonNull String spriteName, @NonNull BufferedImage bImage, int rows, int columns) {
+    public BufferedImage[] getSprites(@NonNull String spriteName, @NonNull BufferedImage bImage, int rows, int columns) {
         if (spritesMap.containsKey(spriteName)) {
             return spritesMap.get(spriteName);
         }
@@ -36,7 +38,7 @@ public final class FoxSpritesCombiner {
         return result;
     }
 
-    public static void removeSprites(@NonNull String spriteName) {
+    public void removeSprites(@NonNull String spriteName) {
         if (!spritesMap.containsKey(spriteName)) {
             return;
         }

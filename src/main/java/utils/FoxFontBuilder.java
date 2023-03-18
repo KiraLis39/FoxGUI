@@ -20,7 +20,7 @@ import java.util.Map.Entry;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public final class FoxFontBuilder {
+public class FoxFontBuilder {
     private final FONT defaultFont = FONT.ARIAL_NARROW;
     private final GraphicsEnvironment gEnv; // = GraphicsEnvironment.getLocalGraphicsEnvironment();
     private final List<String> fArr = new LinkedList<>(); // набор шрифтов по-умолчанию.
