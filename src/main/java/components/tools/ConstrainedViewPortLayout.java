@@ -1,11 +1,10 @@
 package components.tools;
 
-import java.awt.Container;
-import java.awt.Dimension;
-import javax.swing.ViewportLayout;
+import javax.swing.*;
+import java.awt.*;
 
 public class ConstrainedViewPortLayout extends ViewportLayout {
-	@Override
+    @Override
     public Dimension preferredLayoutSize(Container parent) {
         Dimension preferredViewSize = super.preferredLayoutSize(parent);
         Container viewportContainer = parent.getParent();

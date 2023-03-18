@@ -6,11 +6,8 @@ import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class FoxSpritesCombiner {
+public final class FoxSpritesCombiner {
     private final static Map<String, BufferedImage[]> spritesMap = new LinkedHashMap<>();
-
-    private FoxSpritesCombiner() {
-    }
 
     public static BufferedImage[] getSprites(@NonNull String spriteName, @NonNull BufferedImage bImage, int rows, int columns) {
         if (spritesMap.containsKey(spriteName)) {
@@ -22,15 +19,15 @@ public class FoxSpritesCombiner {
         }
 
         int iter = 0;
-        Double tileWidth = bImage.getWidth() / columns * 1d;
-        Double tileHeight = bImage.getHeight() / rows * 1d;
+        double tileWidth = bImage.getWidth() / columns * 1d;
+        double tileHeight = bImage.getHeight() / rows * 1d;
         int tilesCountExpected = rows * columns;
         BufferedImage[] result = new BufferedImage[tilesCountExpected];
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < columns; col++) {
                 result[iter] = bImage.getSubimage(
-                        tileWidth.intValue() * col, tileHeight.intValue() * row,
-                        tileWidth.intValue(), tileHeight.intValue());
+                        (int) tileWidth * col, (int) tileHeight * row,
+                        (int) tileWidth, (int) tileHeight);
                 iter++;
             }
         }

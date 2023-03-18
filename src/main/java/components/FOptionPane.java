@@ -1,5 +1,9 @@
 package components;
 
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import utils.FoxFontBuilder;
 import utils.InputAction;
 
@@ -14,11 +18,13 @@ import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
+@Component
+@RequiredArgsConstructor
 public class FOptionPane extends JDialog implements ActionListener {
-    public enum TYPE {INFO, YES_NO_TYPE, VARIANTS, INPUT}
-    private final TYPE type;
-
-    private Thread toThread;
+    private final InputAction inputAction;
+    private final FoxFontBuilder fontBuilder;
+    private TYPE type;
     private JButton OK_BUTTON, NO_BUTTON, YES_BUTTON;
     private BufferedImage ico;
     private int answer = -1, timeout = 15;
@@ -26,20 +32,19 @@ public class FOptionPane extends JDialog implements ActionListener {
     private JTextField inputField;
     private JPanel upLabelPane;
     private String timeLastLabel;
-
-    public FOptionPane(String title, String message) {
-        this(title, message, null, null, true);
+    public void buildFOptionPane(String title, String message) {
+        buildFOptionPane(title, message, null, null, true);
     }
 
-    public FOptionPane(String title, String message, BufferedImage ico) {
-        this(title, message, null, ico, true);
+    public void buildFOptionPane(String title, String message, BufferedImage ico) {
+        buildFOptionPane(title, message, null, ico, true);
     }
 
-    public FOptionPane(String title, String message, TYPE type) {
-        this(title, message, type, null, true);
+    public void buildFOptionPane(String title, String message, TYPE type) {
+        buildFOptionPane(title, message, type, null, true);
     }
 
-    public FOptionPane(String title, String message, TYPE type, BufferedImage _ico, boolean isModal) {
+    public void buildFOptionPane(String title, String message, TYPE type, BufferedImage _ico, boolean isModal) {
         this.type = type == null ? TYPE.INFO : type;
         if (ico != null) {
             this.ico = _ico;
@@ -73,7 +78,7 @@ public class FOptionPane extends JDialog implements ActionListener {
                         g.fillRect(0, 0, getWidth(), getHeight());
 
                         g.setColor(Color.GRAY);
-                        g.drawString(timeLastLabel, (int) (getWidth() - FoxFontBuilder.getStringBounds(g, timeLastLabel).getWidth()), 14);
+                        g.drawString(timeLastLabel, (int) (getWidth() - fontBuilder.getStringBounds(g, timeLastLabel).getWidth()), 14);
                     }
 
                     {
@@ -126,16 +131,12 @@ public class FOptionPane extends JDialog implements ActionListener {
                                 setBorder(new EmptyBorder(16, 6, 0, 0));
 
                                 if (type == TYPE.INPUT) {
-                                    JPanel inputPane = new JPanel(new GridLayout(3,1,0,0)) {
+                                    JPanel inputPane = new JPanel(new GridLayout(3, 1, 0, 0)) {
                                         {
                                             setOpaque(false);
-                                            setBorder(new EmptyBorder(0,0,0,9));
+                                            setBorder(new EmptyBorder(0, 0, 0, 9));
 
-                                            inputField = new JTextField() {
-                                                {
-
-                                                }
-                                            };
+                                            inputField = new JTextField();
                                             add(new JLabel(message) {
                                                 {
                                                     setForeground(Color.WHITE);
@@ -183,7 +184,7 @@ public class FOptionPane extends JDialog implements ActionListener {
                         setOpaque(false);
 
                         switch (FOptionPane.this.type) {
-                            case INPUT,INFO -> {
+                            case INPUT, INFO -> {
                                 OK_BUTTON = new JButton("OK") {
                                     {
                                         setActionCommand("ok");
@@ -253,8 +254,8 @@ public class FOptionPane extends JDialog implements ActionListener {
 
         add(basePane);
 
-        InputAction.add("foxPane", this);
-        InputAction.set("foxPane", "abort", KeyEvent.VK_ESCAPE, 0, new AbstractAction() {
+        inputAction.add("foxPane", this);
+        inputAction.set("foxPane", "abort", KeyEvent.VK_ESCAPE, 0, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 timeout = 0;
@@ -264,16 +265,20 @@ public class FOptionPane extends JDialog implements ActionListener {
         pack();
         setLocationRelativeTo(null);
 
-        toThread = new Thread(() -> {
+        // повышение отзывчивости.
+        Thread toThread = new Thread(() -> {
             while (timeout > 0) {
                 timeout--;
                 timeLastLabel = "Осталось: " + timeout + " сек.";
                 upLabelPane.repaint();
                 try {
                     TimeUnit.MILLISECONDS.sleep(500);
-                    if (timeout == 0) {break;} // повышение отзывчивости.
+                    if (timeout == 0) {
+                        break;
+                    } // повышение отзывчивости.
                     TimeUnit.MILLISECONDS.sleep(500);
-                } catch (InterruptedException ignore) {}
+                } catch (InterruptedException ignore) {
+                }
             }
             answer = -1;
             FOptionPane.this.dispose();
@@ -316,4 +321,6 @@ public class FOptionPane extends JDialog implements ActionListener {
 
         FOptionPane.this.dispose();
     }
+
+    public enum TYPE {INFO, YES_NO_TYPE, VARIANTS, INPUT}
 }

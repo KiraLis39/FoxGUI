@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.plaf.basic.BasicLookAndFeel;
 
 
-public class FoxLookAndFeel extends BasicLookAndFeel {
+public final class FoxLookAndFeel extends BasicLookAndFeel {
     @Override
     public String getName() {
         return "FoxLookAndFeel";

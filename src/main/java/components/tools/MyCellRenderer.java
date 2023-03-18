@@ -3,18 +3,17 @@ package components.tools;
 import javax.swing.*;
 import java.awt.*;
 
-public class MyCellRenderer extends JPanel implements ListCellRenderer {
+public class MyCellRenderer extends JPanel implements ListCellRenderer<JButton> {
     private static int cellHeight;
 
-    private JButton label;
-
     public MyCellRenderer(int cellHeight) {
-        this.cellHeight = cellHeight;
+        MyCellRenderer.cellHeight = cellHeight;
 
         setLayout(new BorderLayout());
         setBackground(Color.DARK_GRAY);
 
-        label = new JButton() {
+        //                setFont(registry.Registry.trackSelectedFont);
+        JButton label = new JButton() {
             {
                 setHorizontalTextPosition(JButton.RIGHT);
                 setHorizontalAlignment(JButton.LEFT);
@@ -26,7 +25,7 @@ public class MyCellRenderer extends JPanel implements ListCellRenderer {
     }
 
     @Override
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+    public Component getListCellRendererComponent(JList<? extends JButton> list, JButton value, int index, boolean isSelected, boolean cellHasFocus) {
         setEnabled(list.isEnabled());
         setFont(list.getFont());
 

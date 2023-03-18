@@ -2,13 +2,9 @@ package utils;
 
 import lombok.NonNull;
 
-import java.awt.image.BufferedImage;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MediaCache {
+public final class MediaCache {
     private final static ConcurrentHashMap<String, Object> map = new ConcurrentHashMap<>();
     private static MediaCache cache;
 //    private static long USED_MEMORY, MAX_LOAD_ALLOWED;
@@ -16,8 +12,6 @@ public class MediaCache {
 //    private final int MIN_CASH_SIZE_TO_CLEARING = 128;
 //    private final float memGCTrigger = 0.75f;
 //    ImageIO.setUseCache(false);
-
-    private MediaCache() {}
 
     public static MediaCache getInstance() {
         if (cache == null) {

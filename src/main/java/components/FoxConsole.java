@@ -1,5 +1,9 @@
 package components;
 
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import utils.InputAction;
 
 import javax.swing.*;
@@ -11,27 +15,32 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 
+@Data
+@Slf4j
+@Component
+@RequiredArgsConstructor
 public class FoxConsole extends JDialog {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+    private final InputAction inputAction;
 
-    private final JFrame parentFrame;
+    private JFrame parentFrame;
     private JPanel upTactAndClockPane, foxConsolePanel;
     private JScrollPane consoleScroll;
     private JTextArea consoleArea;
     private JTextField inputArea;
     private JLabel oClock;
-
-    private final boolean clockIsOn = false;
-
     private Font f0, f1, f2;
+    private boolean clockIsOn = false;
 
 
-    public FoxConsole(JFrame parent) {
-        this(parent, "Console", true);
+    public void buildFoxConsole(JFrame parent) {
+        buildFoxConsole(parent, "Console", true);
     }
 
-    public FoxConsole(JFrame parent, String consoleTitle, boolean isModal) {
-        super(parent, consoleTitle, isModal);
+    public void buildFoxConsole(JFrame parent, String consoleTitle, boolean isModal) {
+//        super(parent);
+        setTitle(consoleTitle);
+        setModal(isModal);
         this.parentFrame = parent;
 
         setLayout(new BorderLayout());
@@ -45,24 +54,24 @@ public class FoxConsole extends JDialog {
     }
 
     private void inAc() {
-        InputAction.add("console", FoxConsole.this);
-        InputAction.set("console", "onOff", KeyEvent.VK_BACK_QUOTE, 0, new AbstractAction() {
+        inputAction.add("console", FoxConsole.this);
+        inputAction.set("console", "onOff", KeyEvent.VK_BACK_QUOTE, 0, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 visibleChanger();
             }
         });
 
-        InputAction.add("parent", parentFrame);
-        InputAction.set("parent", "onOff", KeyEvent.VK_BACK_QUOTE, 0, new AbstractAction() {
+        inputAction.add("parent", parentFrame);
+        inputAction.set("parent", "onOff", KeyEvent.VK_BACK_QUOTE, 0, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 visibleChanger();
             }
         });
 
-        InputAction.add("inputArea", inputArea);
-        InputAction.set("inputArea", "send", KeyEvent.VK_ENTER, 0, new AbstractAction() {
+        inputAction.add("inputArea", inputArea);
+        inputAction.set("inputArea", "send", KeyEvent.VK_ENTER, 0, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!inputArea.getText().isEmpty()) {

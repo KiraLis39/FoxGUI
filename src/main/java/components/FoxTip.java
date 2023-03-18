@@ -1,5 +1,8 @@
 package components;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import render.FoxRender;
 
 import javax.swing.*;
@@ -10,36 +13,33 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 
-public class FoxTip extends JDialog implements WindowFocusListener, ComponentListener {
-    private final JComponent owner;
-
-    public enum TYPE {INPUT, INFO}
-    private TYPE type;
-
-    private JPanel contentPanel;
-    private JTextField inputField;
-
-    private Timer timer;
-
-    private float opacity = 0.1f;
-    private final float MAX_OPAQUE = 0.9f;
-
+@Slf4j
+@Component
+@AllArgsConstructor
+public final class FoxTip extends JDialog implements WindowFocusListener, ComponentListener {
+    private final FoxRender render;
     private static Color baseColor = new Color(1.0f, 1.0f, 1.0f, 0.2f);
     private static Color secondColor = new Color(0.25f, 0.25f, 0.35f, 0.9f);
     private static Color borderColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+    private static final float MAX_OPAQUE = 0.9f;
+    private static float opacity = 0.1f;
+    private JComponent owner;
+    private TYPE type;
+    private JPanel contentPanel;
+    private JTextField inputField;
+    private Timer timer;
 
-
-    public FoxTip(TYPE type, BufferedImage icon, String title, String message, String footer, JComponent owner) {
-        this(type, icon, title, message, footer, baseColor, secondColor, borderColor, owner);
+    public void createFoxTip(TYPE type, BufferedImage icon, String title, String message, String footer, JComponent owner) {
+        createFoxTip(type, icon, title, message, footer, baseColor, secondColor, borderColor, owner);
     }
 
-    public FoxTip(TYPE type, BufferedImage icon, String title, String message, String footer,
-                  Color baseColor, Color secondColor, Color borderColor, JComponent owner) {
+    public void createFoxTip(TYPE type, BufferedImage icon, String title, String message, String footer,
+                  Color _baseColor, Color _secondColor, Color _borderColor, JComponent owner) {
         this.type = type;
         this.owner = owner;
-        this.baseColor = baseColor;
-        this.secondColor = secondColor;
-        this.borderColor = borderColor;
+        baseColor = _baseColor;
+        secondColor = _secondColor;
+        borderColor = _borderColor;
         this.inputField = type == TYPE.INPUT ? new JTextField() : null;
 
         setLayout(new BorderLayout());
@@ -53,64 +53,6 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
         addComponentListener(this);
 
         contentPanel = new JPanel(new BorderLayout(4, 4)) {
-            @Override
-            public void paint(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g;
-                FoxRender.setRender(g2d, FoxRender.RENDER.HIGH);
-                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
-
-                GeneralPath gp = buildForm();
-                g2d.setColor(baseColor);
-                g2d.fill(gp);
-
-                g2d.setPaint(new GradientPaint(0, 0, secondColor, getWidth() / 3f, 0, baseColor));
-                g2d.fill(gp);
-
-                g2d.setPaint(new GradientPaint(0, 0, baseColor, 0, getHeight() - 11f, secondColor));
-                g2d.fill(gp);
-
-                g2d.setPaint(borderColor);
-                g2d.draw(gp);
-
-                super.paint(g2d);
-            }
-
-            private GeneralPath buildForm() {
-                GeneralPath gp = new GeneralPath(Path2D.WIND_EVEN_ODD);
-                if (owner.getLocation().y <= getHeight()) {
-                    gp.moveTo(5, 5);
-                    gp.quadTo(5, 0, 10, 0);
-                    gp.lineTo(getWidth() / 2 - 10, 0);
-
-                    gp.lineTo(getWidth() / 2, -11);
-                    gp.lineTo(getWidth() / 2 + 10, 0);
-
-                    gp.lineTo(getWidth() - 12, 0);
-                    gp.quadTo(getWidth() - 6, 0, getWidth() - 6, 5);
-                    gp.lineTo(getWidth() - 6, getHeight() - 16);
-                    gp.quadTo(getWidth() - 6, getHeight() - 11, getWidth() - 11, getHeight() - 11);
-                    gp.lineTo(10, getHeight() - 11);
-                    gp.quadTo(5, getHeight() - 11, 5, getHeight() - 16);
-                    gp.lineTo(5, 5);
-                } else {
-                    gp.moveTo(5, 5);
-                    gp.quadTo(5, 0, 10, 0);
-                    gp.lineTo(getWidth() - 11, 0);
-                    gp.quadTo(getWidth() - 6, 0, getWidth() - 6, 5);
-                    gp.lineTo(getWidth() - 6, getHeight() - 16);
-                    gp.quadTo(getWidth() - 6, getHeight() - 11, getWidth() - 11, getHeight() - 11);
-                    gp.lineTo(getWidth() / 2 + 10, getHeight() - 11);
-
-                    gp.lineTo(getWidth() / 2, getHeight() - 1);
-                    gp.lineTo(getWidth() / 2 - 10, getHeight() - 11);
-
-                    gp.lineTo(10, getHeight() - 11);
-                    gp.quadTo(5, getHeight() - 11, 5, getHeight() - 16);
-                    gp.lineTo(5, 5);
-                }
-                return gp;
-            }
-
             {
                 setOpaque(false);
                 setBorder(new EmptyBorder(6, 10, 15, 10));
@@ -120,7 +62,7 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
                     @Override
                     public void paintComponent(Graphics g) {
                         Graphics2D g2d = (Graphics2D) g;
-                        FoxRender.setRender(g2d, FoxRender.RENDER.HIGH);
+                        render.setRender(g2d, FoxRender.RENDER.HIGH);
                         if (icon != null) {
                             g2d.drawImage(icon, 0, 0, 64, 64, this);
                         }
@@ -139,7 +81,7 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
                             @Override
                             public void paint(Graphics g) {
                                 Graphics2D g2d = (Graphics2D) g;
-                                FoxRender.setRender(g2d, FoxRender.RENDER.HIGH);
+                                render.setRender(g2d, FoxRender.RENDER.HIGH);
                                 g2d.setColor(new Color(1.0f, 1.0f, 1.0f, 0.2f));
                                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 6, 6);
                                 super.paint(g);
@@ -179,7 +121,7 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
                             @Override
                             public void paint(Graphics g) {
                                 Graphics2D g2d = (Graphics2D) g;
-                                FoxRender.setRender(g2d, FoxRender.RENDER.HIGH);
+                                render.setRender(g2d, FoxRender.RENDER.HIGH);
                                 g2d.setStroke(new BasicStroke(2f));
                                 g2d.setPaint(mouseOver ? over : out);
                                 g2d.drawLine(1, 0, getWidth() - 2, 12);
@@ -196,7 +138,7 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
                     @Override
                     public void paint(Graphics g) {
                         Graphics2D g2d = (Graphics2D) g;
-                        FoxRender.setRender(g2d, FoxRender.RENDER.HIGH);
+                        render.setRender(g2d, FoxRender.RENDER.HIGH);
                         g2d.setPaint(new GradientPaint(0, 0, baseColor, 0, getHeight() - 11, secondColor));
                         g2d.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 6, 6);
                         g2d.setColor(new Color(1.0f, 1.0f, 1.0f, 0.3f));
@@ -219,6 +161,64 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
                     add(inputField, BorderLayout.SOUTH);
                 }
             }
+
+            @Override
+            public void paint(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g;
+                render.setRender(g2d, FoxRender.RENDER.HIGH);
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+
+                GeneralPath gp = buildForm();
+                g2d.setColor(baseColor);
+                g2d.fill(gp);
+
+                g2d.setPaint(new GradientPaint(0, 0, secondColor, getWidth() / 3f, 0, baseColor));
+                g2d.fill(gp);
+
+                g2d.setPaint(new GradientPaint(0, 0, baseColor, 0, getHeight() - 11f, secondColor));
+                g2d.fill(gp);
+
+                g2d.setPaint(borderColor);
+                g2d.draw(gp);
+
+                super.paint(g2d);
+            }
+
+            private GeneralPath buildForm() {
+                GeneralPath gp = new GeneralPath(Path2D.WIND_EVEN_ODD);
+                if (owner.getLocation().y <= getHeight()) {
+                    gp.moveTo(5, 5);
+                    gp.quadTo(5, 0, 10, 0);
+                    gp.lineTo(getWidth() / 2f - 10, 0);
+
+                    gp.lineTo(getWidth() / 2f, -11);
+                    gp.lineTo(getWidth() / 2f + 10, 0);
+
+                    gp.lineTo(getWidth() - 12, 0);
+                    gp.quadTo(getWidth() - 6, 0, getWidth() - 6, 5);
+                    gp.lineTo(getWidth() - 6, getHeight() - 16);
+                    gp.quadTo(getWidth() - 6, getHeight() - 11, getWidth() - 11, getHeight() - 11);
+                    gp.lineTo(10, getHeight() - 11);
+                    gp.quadTo(5, getHeight() - 11, 5, getHeight() - 16);
+                    gp.lineTo(5, 5);
+                } else {
+                    gp.moveTo(5, 5);
+                    gp.quadTo(5, 0, 10, 0);
+                    gp.lineTo(getWidth() - 11, 0);
+                    gp.quadTo(getWidth() - 6, 0, getWidth() - 6, 5);
+                    gp.lineTo(getWidth() - 6, getHeight() - 16);
+                    gp.quadTo(getWidth() - 6, getHeight() - 11, getWidth() - 11, getHeight() - 11);
+                    gp.lineTo(getWidth() / 2f + 10, getHeight() - 11);
+
+                    gp.lineTo(getWidth() / 2f, getHeight() - 1);
+                    gp.lineTo(getWidth() / 2f - 10, getHeight() - 11);
+
+                    gp.lineTo(10, getHeight() - 11);
+                    gp.quadTo(5, getHeight() - 11, 5, getHeight() - 16);
+                    gp.lineTo(5, 5);
+                }
+                return gp;
+            }
         };
 
         add(contentPanel, BorderLayout.CENTER);
@@ -240,6 +240,7 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
 
             setVisible(true);
         } catch (NullPointerException npe) {
+            log.error("FoxTip error: " + npe.getMessage());
             throw npe;
         }
     }
@@ -262,7 +263,6 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
         });
         timer.start();
     }
-
 
     @Override
     public void windowGainedFocus(WindowEvent e) {
@@ -296,7 +296,12 @@ public class FoxTip extends JDialog implements WindowFocusListener, ComponentLis
 
         timer.start();
     }
+
     public void componentHidden(ComponentEvent e) {}
+
     public void componentResized(ComponentEvent e) {}
+
     public void componentMoved(ComponentEvent e) {}
+
+    public enum TYPE {INPUT, INFO}
 }
