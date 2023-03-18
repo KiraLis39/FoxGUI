@@ -14,8 +14,8 @@ import java.util.Set;
 @Data
 @Component
 public final class InputAction {
-    private FOCUS_TYPE focusType = FOCUS_TYPE.WHEN_IN_FOCUSED_WINDOW;
     private final Map<String, JComponent> compMap = new LinkedHashMap<>();
+    private FOCUS_TYPE focusType = FOCUS_TYPE.WHEN_IN_FOCUSED_WINDOW;
 
     public void add(String name, Window window) {
         add(name, (JComponent) window.getComponent(0));

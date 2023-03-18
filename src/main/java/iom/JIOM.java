@@ -3,9 +3,11 @@ package iom;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import iom.interfaces.JConfigurable;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +18,15 @@ import java.nio.file.Path;
 @AllArgsConstructor
 public final class JIOM {
     private final ObjectMapper mapper;
+
+    private static void checkFileExisting(Path path) throws IOException {
+        if (Files.notExists(path)) {
+            if (Files.notExists(path.getParent())) {
+                Files.createDirectories(path.getParent());
+            }
+            Files.createFile(path);
+        }
+    }
 
     public <T extends JConfigurable> T fileToDto(final Path dtoPath, Class<T> clazz) throws Exception {
         checkFileExisting(dtoPath);
@@ -39,14 +50,5 @@ public final class JIOM {
 
         checkFileExisting(dto.getSource());
         mapper.writerWithDefaultPrettyPrinter().writeValue(dto.getSource().toFile(), dto);
-    }
-
-    private static void checkFileExisting(Path path) throws IOException {
-        if (Files.notExists(path)) {
-            if (Files.notExists(path.getParent())) {
-                Files.createDirectories(path.getParent());
-            }
-            Files.createFile(path);
-        }
     }
 }

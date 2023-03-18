@@ -10,6 +10,7 @@ import java.awt.*;
 public final class MyButtonUI extends BasicButtonUI {
     private static MyButtonUI instance = null;
     private final FoxRender render = new FoxRender();
+
     public static ComponentUI createUI(JComponent c) {
         // Создаём инстанс нашего UI
         if (instance == null) {

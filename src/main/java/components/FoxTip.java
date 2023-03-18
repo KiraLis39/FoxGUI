@@ -17,12 +17,12 @@ import java.awt.image.BufferedImage;
 @Component
 @AllArgsConstructor
 public final class FoxTip extends JDialog implements WindowFocusListener, ComponentListener {
-    private final FoxRender render;
+    private static final float MAX_OPAQUE = 0.9f;
     private static Color baseColor = new Color(1.0f, 1.0f, 1.0f, 0.2f);
     private static Color secondColor = new Color(0.25f, 0.25f, 0.35f, 0.9f);
     private static Color borderColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
-    private static final float MAX_OPAQUE = 0.9f;
     private static float opacity = 0.1f;
+    private final FoxRender render;
     private JComponent owner;
     private TYPE type;
     private JPanel contentPanel;
@@ -34,7 +34,7 @@ public final class FoxTip extends JDialog implements WindowFocusListener, Compon
     }
 
     public void createFoxTip(TYPE type, BufferedImage icon, String title, String message, String footer,
-                  Color _baseColor, Color _secondColor, Color _borderColor, JComponent owner) {
+                             Color _baseColor, Color _secondColor, Color _borderColor, JComponent owner) {
         this.type = type;
         this.owner = owner;
         baseColor = _baseColor;
@@ -297,11 +297,14 @@ public final class FoxTip extends JDialog implements WindowFocusListener, Compon
         timer.start();
     }
 
-    public void componentHidden(ComponentEvent e) {}
+    public void componentHidden(ComponentEvent e) {
+    }
 
-    public void componentResized(ComponentEvent e) {}
+    public void componentResized(ComponentEvent e) {
+    }
 
-    public void componentMoved(ComponentEvent e) {}
+    public void componentMoved(ComponentEvent e) {
+    }
 
     public enum TYPE {INPUT, INFO}
 }

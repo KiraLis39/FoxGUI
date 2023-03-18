@@ -1,6 +1,5 @@
 package components;
 
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -32,6 +31,7 @@ public class FOptionPane extends JDialog implements ActionListener {
     private JTextField inputField;
     private JPanel upLabelPane;
     private String timeLastLabel;
+
     public void buildFOptionPane(String title, String message) {
         buildFOptionPane(title, message, null, null, true);
     }
