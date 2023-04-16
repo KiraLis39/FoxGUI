@@ -1,7 +1,8 @@
 package fox.components;
 
-import fox.utils.FoxFontBuilder;
+import fox.FoxFontBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -11,6 +12,7 @@ import java.awt.event.*;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
 
+@Slf4j
 @RequiredArgsConstructor
 public class FoxConsole2 extends JDialog implements KeyListener {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
@@ -24,7 +26,7 @@ public class FoxConsole2 extends JDialog implements KeyListener {
     private JTextArea consoleArea;
     private JTextField inputArea;
     private JLabel oClock;
-    private Boolean clockIsOn = false;
+    private boolean clockIsOn;
 
     public FoxConsole2(JFrame parent, String consoleTitle, Boolean isModal) {
         this(parent, consoleTitle, isModal, null);
@@ -36,7 +38,7 @@ public class FoxConsole2 extends JDialog implements KeyListener {
         try {
             UIManager.setLookAndFeel(new NimbusLookAndFeel());
         } catch (Exception e) {
-            System.err.println("Couldn't get specified look and feel, for some reason.");
+            log.error("Couldn't get specified look and feel, for some reason.");
         }
 
         consoleFrame = this;
@@ -57,7 +59,7 @@ public class FoxConsole2 extends JDialog implements KeyListener {
         testFrameComponent.getActionMap().put("onoff", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println(">> " + e.getID() + " - " + e.getModifiers());
+                log.debug(">> " + e.getID() + " - " + e.getModifiers());
                 visibleChanger();
             }
         });
@@ -148,6 +150,7 @@ public class FoxConsole2 extends JDialog implements KeyListener {
                         oClock.setText("" + dateFormat.format(System.currentTimeMillis()));
                     }
 
+                    @Override
                     public void mouseExited(MouseEvent e) {
                     }
                 });
@@ -229,15 +232,13 @@ public class FoxConsole2 extends JDialog implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent key) {
-        if (key.getKeyCode() == KeyEvent.VK_ENTER) {
-            if (!inputArea.getText().isEmpty()) {
-                consoleArea.append("\n" + inputArea.getText());
-                consoleArea.setText(consoleArea.getText().trim());
-                consoleArea.setCaretPosition(consoleArea.getText().length());
+        if (key.getKeyCode() == KeyEvent.VK_ENTER && !inputArea.getText().isEmpty()) {
+            consoleArea.append("\n" + inputArea.getText());
+            consoleArea.setText(consoleArea.getText().trim());
+            consoleArea.setCaretPosition(consoleArea.getText().length());
 
-                inputArea.setText("");
-                inputArea.requestFocus();
-            }
+            inputArea.setText("");
+            inputArea.requestFocus();
         }
     }
 

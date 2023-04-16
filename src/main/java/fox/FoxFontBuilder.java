@@ -1,4 +1,4 @@
-package fox.utils;
+package fox;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 @Slf4j
-public final class FoxFontBuilder {
+public class FoxFontBuilder {
     private final FONT defaultFont = FONT.ARIAL_NARROW;
     private final GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
     private final List<String> fArr = new LinkedList<>(); // набор шрифтов по-умолчанию.
@@ -36,13 +36,13 @@ public final class FoxFontBuilder {
         return setFoxFont(fontName.ordinal(), Math.round(fontSize), isBold, gEnv);
     }
 
-    public Font setFoxFont(int ID, int fontSize, Boolean isBold, GraphicsEnvironment gEnv) {
-        if (ID > fArr.size() - 1) {
-            fontNotExistsMessage(ID);
+    public Font setFoxFont(int id, int fontSize, boolean isBold, GraphicsEnvironment gEnv) {
+        if (id > fArr.size() - 1) {
+            fontNotExistsMessage(id);
             return new Font(fArr.get(defaultFont.ordinal()), isBold ? Font.BOLD : Font.PLAIN, fontSize); // BOLD, ITALIC, BOLD+ITALIC
         }
 
-        if (!isFontExist(ID, gEnv)) {
+        if (!isFontExist(id, gEnv)) {
             if (fontsDirectory == null) {
                 fontsDirectory = Paths.get("./fonts/");
                 try {
@@ -75,12 +75,12 @@ public final class FoxFontBuilder {
             }
 
             // если не получилось, возвращаем шрифт по-умолчанию:
-            if (!isFontExist(ID, gEnv)) {
+            if (!isFontExist(id, gEnv)) {
                 return new Font(fArr.get(defaultFont.ordinal()), isBold ? Font.BOLD : Font.PLAIN, fontSize);
             }
         }
 
-        return new Font(fArr.get(ID), isBold ? Font.BOLD : Font.PLAIN, fontSize);
+        return new Font(fArr.get(id), isBold ? Font.BOLD : Font.PLAIN, fontSize);
     }
 
     private boolean isFontExist(int ID, GraphicsEnvironment gEnv) {
@@ -135,7 +135,7 @@ public final class FoxFontBuilder {
         if (!tmpMap.isEmpty()) {
             return tmpMap.entrySet();
         } else {
-            return null;
+            return Collections.emptySet();
         }
     }
 

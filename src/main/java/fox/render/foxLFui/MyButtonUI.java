@@ -1,17 +1,17 @@
 package fox.render.foxLFui;
 
-import fox.render.FoxRender;
+import fox.FoxRender;
 
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
 
-public final class MyButtonUI extends BasicButtonUI {
+public class MyButtonUI extends BasicButtonUI {
     private static MyButtonUI instance = null;
     private final FoxRender render = new FoxRender();
 
-    public static ComponentUI createUI(JComponent c) {
+    public static ComponentUI createUI(JComponent component) {
         // Создаём инстанс нашего UI
         if (instance == null) {
             instance = new MyButtonUI();
@@ -19,6 +19,7 @@ public final class MyButtonUI extends BasicButtonUI {
         return instance;
     }
 
+    @Override
     public void installUI(JComponent c) {
         // Обязательно оставляем установку UI, реализованную в Basic UI классе
         super.installUI(c);
@@ -32,6 +33,7 @@ public final class MyButtonUI extends BasicButtonUI {
         button.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
     }
 
+    @Override
     public void paint(Graphics g, JComponent c) {
         Graphics2D g2d = (Graphics2D) g;
         render.setRender(g2d, FoxRender.RENDER.LOW);

@@ -1,10 +1,10 @@
-package fox.render;
+package fox;
 
 import lombok.NonNull;
 
 import java.awt.*;
 
-public final class FoxRender {
+public class FoxRender {
 //	image.getScaledInstance(1024, 768, 2);
 //	g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.0f));
 

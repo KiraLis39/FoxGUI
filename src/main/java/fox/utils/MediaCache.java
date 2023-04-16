@@ -9,8 +9,8 @@ import java.io.ByteArrayInputStream;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-public final class MediaCache {
-    private final static ConcurrentHashMap<String, Object> map = new ConcurrentHashMap<>();
+public class MediaCache {
+    private static final ConcurrentHashMap<String, Object> map = new ConcurrentHashMap<>();
     private static MediaCache cache;
 
 //    private static long USED_MEMORY, MAX_LOAD_ALLOWED;

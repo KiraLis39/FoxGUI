@@ -1,6 +1,6 @@
 package fox.components;
 
-import fox.utils.FoxFontBuilder;
+import fox.FoxFontBuilder;
 import fox.utils.InputAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,8 +42,8 @@ public class FOptionPane extends JDialog implements ActionListener {
         buildFOptionPane(title, message, type, null, true);
     }
 
-    public void buildFOptionPane(String title, String message, TYPE type, BufferedImage _ico, boolean isModal) {
-        this.type = type == null ? TYPE.INFO : type;
+    public void buildFOptionPane(String title, String message, TYPE _type, BufferedImage _ico, boolean isModal) {
+        type = _type == null ? TYPE.INFO : _type;
         if (ico != null) {
             this.ico = _ico;
         } else {
@@ -61,7 +61,7 @@ public class FOptionPane extends JDialog implements ActionListener {
         setUndecorated(true);
         setBackground(new Color(0.1f, 0.1f, 0.1f, 0.9f));
         setPreferredSize(new Dimension(300, 150));
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         getRootPane().setBorder(new EmptyBorder(3, 3, 3, 3));
 
         JPanel basePane = new JPanel(new BorderLayout(3, 3)) {
@@ -237,8 +237,6 @@ public class FOptionPane extends JDialog implements ActionListener {
                                 };
                                 add(YES_BUTTON);
                                 add(NO_BUTTON);
-                            }
-                            default -> {
                             }
                         }
                     }

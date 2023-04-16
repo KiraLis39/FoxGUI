@@ -1,6 +1,6 @@
 package fox.components;
 
-import fox.render.FoxRender;
+import fox.FoxRender;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -97,16 +97,17 @@ public final class FoxTip extends JDialog implements WindowFocusListener, Compon
 //										setOpaque(false);
                                 setPreferredSize(new Dimension(12, 12));
                                 addMouseListener(new MouseAdapter() {
+                                    @Override
                                     public void mouseEntered(MouseEvent e) {
                                         mouseOver = true;
                                         repaint();
                                     }
-
+                                    @Override
                                     public void mouseExited(MouseEvent e) {
                                         mouseOver = false;
                                         repaint();
                                     }
-
+                                    @Override
                                     public void mousePressed(MouseEvent e) {
                                         close();
                                     }
@@ -195,24 +196,24 @@ public final class FoxTip extends JDialog implements WindowFocusListener, Compon
                     gp.lineTo(getWidth() - 12, 0);
                     gp.quadTo(getWidth() - 6, 0, getWidth() - 6, 5);
                     gp.lineTo(getWidth() - 6, getHeight() - 16);
-                    gp.quadTo(getWidth() - 6, getHeight() - 11, getWidth() - 11, getHeight() - 11);
-                    gp.lineTo(10, getHeight() - 11);
+                    gp.quadTo(getWidth() - 6, getHeight() - 11, getWidth() - 11f, getHeight() - 11);
+                    gp.lineTo(10, getHeight() - 11f);
                     gp.quadTo(5, getHeight() - 11, 5, getHeight() - 16);
                     gp.lineTo(5, 5);
                 } else {
                     gp.moveTo(5, 5);
                     gp.quadTo(5, 0, 10, 0);
                     gp.lineTo(getWidth() - 11, 0);
-                    gp.quadTo(getWidth() - 6, 0, getWidth() - 6, 5);
-                    gp.lineTo(getWidth() - 6, getHeight() - 16);
-                    gp.quadTo(getWidth() - 6, getHeight() - 11, getWidth() - 11, getHeight() - 11);
+                    gp.quadTo(getWidth() - 6, 0, getWidth() - 6f, 5);
+                    gp.lineTo(getWidth() - 6, getHeight() - 16f);
+                    gp.quadTo(getWidth() - 6, getHeight() - 11, getWidth() - 11f, getHeight() - 11);
                     gp.lineTo(getWidth() / 2f + 10, getHeight() - 11);
 
                     gp.lineTo(getWidth() / 2f, getHeight() - 1);
                     gp.lineTo(getWidth() / 2f - 10, getHeight() - 11);
 
-                    gp.lineTo(10, getHeight() - 11);
-                    gp.quadTo(5, getHeight() - 11, 5, getHeight() - 16);
+                    gp.lineTo(10, getHeight() - 11f);
+                    gp.quadTo(5, getHeight() - 11, 5, getHeight() - 16f);
                     gp.lineTo(5, 5);
                 }
                 return gp;
