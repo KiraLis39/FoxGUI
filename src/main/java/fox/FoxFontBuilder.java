@@ -16,7 +16,7 @@ import java.util.Map.Entry;
 
 @Slf4j
 public class FoxFontBuilder {
-    private final FONT defaultFont = FONT.ARIAL_NARROW;
+    private static final FONT defaultFont = FONT.ARIAL_NARROW;
     private final GraphicsEnvironment gEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
     private final List<String> fArr = new LinkedList<>(); // набор шрифтов по-умолчанию.
     private Path fontsDirectory; // папка с дополнительными шрифтами TRUETYPE
@@ -169,12 +169,19 @@ public class FoxFontBuilder {
     /**
      * @return index of registered font
      */
-    public int register(Font f, GraphicsEnvironment gEnv) {
+    public int register(Font f, GraphicsEnvironment gEnv) throws Exception {
         if (gEnv.registerFont(f)) {
             fArr.add(f.getFontName());
             return fArr.indexOf(f.getFontName());
         } else {
-            throw new RuntimeException("FoxFontBuilder.register: Can`t register the font " + f);
+            Optional<Font> found = Arrays.stream(gEnv.getAllFonts())
+                    .filter(fnt -> fnt.getFontName().equalsIgnoreCase(f.getFontName())).findAny();
+            if (found.isPresent()) {
+                log.debug("FoxFontBuilder.register: The font " + f + " is registered already.");
+                fArr.add(f.getFontName());
+                return fArr.indexOf(f.getFontName());
+            }
+            throw new Exception("FoxFontBuilder.register: Can`t register the font " + f);
         }
 
 //		InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream("roboto-bold.ttf");

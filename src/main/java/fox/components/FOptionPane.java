@@ -1,6 +1,7 @@
 package fox.components;
 
 import fox.FoxFontBuilder;
+import fox.FoxRender;
 import fox.utils.InputAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,16 +20,18 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @RequiredArgsConstructor
 public class FOptionPane extends JDialog implements ActionListener {
-    private final InputAction inputAction;
-    private final FoxFontBuilder fontBuilder;
+    private static final FoxFontBuilder fontBuilder = new FoxFontBuilder();
+    private static final FoxRender render = new FoxRender();
+    private final transient InputAction inputAction = new InputAction();
     private TYPE type;
     private JButton OK_BUTTON, NO_BUTTON, YES_BUTTON;
-    private BufferedImage ico;
+    private final Color baseground = new Color(0.1f, 0.1f, 0.1f, 0.9f);
     private int answer = -1, timeout = 15;
     private JLabel titleLabel;
     private JTextField inputField;
     private JPanel upLabelPane;
     private String timeLastLabel;
+    private transient BufferedImage ico;
 
     public void buildFOptionPane(String title, String message) {
         buildFOptionPane(title, message, null, null, true);
@@ -59,7 +62,7 @@ public class FOptionPane extends JDialog implements ActionListener {
         setTitle(title);
         setAlwaysOnTop(true);
         setUndecorated(true);
-        setBackground(new Color(0.1f, 0.1f, 0.1f, 0.9f));
+        setBackground(baseground);
         setPreferredSize(new Dimension(300, 150));
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         getRootPane().setBorder(new EmptyBorder(3, 3, 3, 3));
@@ -126,6 +129,7 @@ public class FOptionPane extends JDialog implements ActionListener {
                         JPanel mesPane = new JPanel(new BorderLayout(0, 0)) {
                             {
                                 setOpaque(false);
+                                setBackground(baseground);
                                 setBorder(new EmptyBorder(16, 6, 0, 0));
 
                                 if (type == TYPE.INPUT) {
@@ -150,11 +154,12 @@ public class FOptionPane extends JDialog implements ActionListener {
                                         {
                                             setOpaque(false);
                                             setForeground(Color.WHITE);
+                                            setBackground(baseground);
                                             setEditable(false);
                                             setText(message);
                                             setWrapStyleWord(true);
                                             setLineWrap(true);
-                                            setBorder(null);
+                                            setBorder(new EmptyBorder(0,3,0,0));
                                         }
                                     };
 
@@ -164,6 +169,7 @@ public class FOptionPane extends JDialog implements ActionListener {
                                             getViewport().setOpaque(false);
                                             setBorder(null);
                                             getViewport().setBorder(null);
+                                            setBackground(baseground);
                                         }
                                     };
 
@@ -274,6 +280,7 @@ public class FOptionPane extends JDialog implements ActionListener {
                     } // повышение отзывчивости.
                     TimeUnit.MILLISECONDS.sleep(500);
                 } catch (InterruptedException ignore) {
+                    // ignore this
                 }
             }
             answer = -1;
@@ -291,6 +298,7 @@ public class FOptionPane extends JDialog implements ActionListener {
     public void paint(Graphics g) {
         super.paint(g);
         Graphics2D g2D = (Graphics2D) g;
+        render.setRender(g2D, FoxRender.RENDER.MED);
 
         g2D.setColor(Color.DARK_GRAY);
         g2D.setStroke(new BasicStroke(2));
