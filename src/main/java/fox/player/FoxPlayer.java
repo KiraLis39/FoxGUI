@@ -1,26 +1,31 @@
 package fox.player;
 
 import fox.player.interfaces.iPlayer;
+import fox.player.playerUtils.PlayThread;
+import fox.player.playerUtils.VolumeConverter;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Data
 @Slf4j
 public class FoxPlayer implements iPlayer {
     private static final LinkedHashMap<String, File> trackMap = new LinkedHashMap<>();
-    private final ArrayList<PlayThread> playThreads = new ArrayList<>();
     private static final VolumeConverter vConv = new VolumeConverter();
+    private final ArrayList<PlayThread> playThreads = new ArrayList<>();
+    private final String name;
     private volatile int currentPlayerVolumePercent = 0;
     private volatile boolean isMuted = false;
     private volatile boolean isLooped = true;
     private volatile boolean isParallelPlayable = false;
-
-    private final String name;
     private String lastTrack;
 
     public FoxPlayer(@NonNull String name) {

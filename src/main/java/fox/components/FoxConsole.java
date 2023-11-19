@@ -1,13 +1,25 @@
 package fox.components;
 
 import fox.utils.InputAction;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -50,16 +62,16 @@ public class FoxConsole extends JDialog {
     }
 
     private void inAc() {
-        inputAction.add("console", FoxConsole.this);
-        inputAction.set("console", "onOff", KeyEvent.VK_BACK_QUOTE, 0, new AbstractAction() {
+        inputAction.add("console", FoxConsole.this.getRootPane());
+        inputAction.set(JComponent.WHEN_FOCUSED, "console", "onOff", KeyEvent.VK_BACK_QUOTE, 0, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 visibleChanger();
             }
         });
 
-        inputAction.add("parent", parentFrame);
-        inputAction.set("parent", "onOff", KeyEvent.VK_BACK_QUOTE, 0, new AbstractAction() {
+        inputAction.add("parent", parentFrame.getRootPane());
+        inputAction.set(JComponent.WHEN_FOCUSED, "parent", "onOff", KeyEvent.VK_BACK_QUOTE, 0, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 visibleChanger();
@@ -67,7 +79,7 @@ public class FoxConsole extends JDialog {
         });
 
         inputAction.add("inputArea", inputArea);
-        inputAction.set("inputArea", "send", KeyEvent.VK_ENTER, 0, new AbstractAction() {
+        inputAction.set(JComponent.WHEN_FOCUSED, "inputArea", "send", KeyEvent.VK_ENTER, 0, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!inputArea.getText().isEmpty()) {
@@ -83,7 +95,7 @@ public class FoxConsole extends JDialog {
     }
 
     void visibleChanger() {
-        oClock.setText("" + dateFormat.format(System.currentTimeMillis()));
+        oClock.setText(dateFormat.format(System.currentTimeMillis()));
 
         setSize(new Dimension(parentFrame.getWidth(), parentFrame.getHeight() / 3 * 2));
         setLocation(parentFrame.getX(), parentFrame.getY());
@@ -101,7 +113,7 @@ public class FoxConsole extends JDialog {
         };
 
         oClock = new JLabel();
-        oClock.setText("" + dateFormat.format(System.currentTimeMillis()));
+        oClock.setText(dateFormat.format(System.currentTimeMillis()));
         if (f0 != null) {
             oClock.setFont(f0);
         }
@@ -165,7 +177,7 @@ public class FoxConsole extends JDialog {
                     public void mouseEntered(MouseEvent e) {
                         inputArea.requestFocus();
                         inputArea.grabFocus();
-                        oClock.setText("" + dateFormat.format(System.currentTimeMillis()));
+                        oClock.setText(dateFormat.format(System.currentTimeMillis()));
                     }
                 });
             }

@@ -5,8 +5,18 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -39,15 +49,15 @@ public class FoxLogo implements Runnable {
     private boolean isBroken = false;
     private boolean highQualityMode = false;
 
-    public void start(String cornerLabelText, BufferedImage[] textureFilesMassive) {
-        start(cornerLabelText, textureFilesMassive, imStyle, bStyle, breakKey);
+    public void start(String cornerLabelText, BufferedImage... textureFilesMassive) {
+        start(cornerLabelText, imStyle, bStyle, breakKey, textureFilesMassive);
     }
 
-    public void start(String cornerLabelText, BufferedImage[] textureFilesMassive, IMAGE_STYLE imStyle, BACK_STYLE bStyle) {
-        start(cornerLabelText, textureFilesMassive, imStyle, bStyle, breakKey);
+    public void start(String cornerLabelText, IMAGE_STYLE imStyle, BACK_STYLE bStyle, BufferedImage... textureFilesMassive) {
+        start(cornerLabelText, imStyle, bStyle, breakKey, textureFilesMassive);
     }
 
-    public void start(String cornerLabelText, BufferedImage[] textureFilesMassive, IMAGE_STYLE imStyle, BACK_STYLE bStyle, int breakKey) {
+    public void start(String cornerLabelText, IMAGE_STYLE imStyle, BACK_STYLE bStyle, int breakKey, BufferedImage... textureFilesMassive) {
         if (textureFilesMassive == null || textureFilesMassive.length == 0) {
             log.error("Textures massive is can not be a NULL or empty");
             throw new NoSuchElementException("Textures massive is NULL or empty");
@@ -70,6 +80,7 @@ public class FoxLogo implements Runnable {
     @Override
     public void run() {
         loadNextImage();
+        logoFrame.setVisible(true);
         timeStamp = System.currentTimeMillis();
         while (!isBroken && !engine.isInterrupted()) {
             try {
@@ -88,7 +99,6 @@ public class FoxLogo implements Runnable {
 
     private void loadNextImage() {
         picCounter++;
-
         if (picCounter >= images.length) {
             isBroken = true;
         } else {
@@ -137,13 +147,13 @@ public class FoxLogo implements Runnable {
         this.imageShowTime = imageShowTime;
     }
 
-    public enum IMAGE_STYLE { FILL, DEFAULT, WRAP }
+    public enum IMAGE_STYLE {FILL, DEFAULT, WRAP}
 
-    public enum BACK_STYLE { ASIS, PICK, COLOR }
+    public enum BACK_STYLE {ASIS, PICK, COLOR}
 
     private class LogoFrame extends JFrame {
-        private boolean isLogoAppearing = true, isLogoVanishing = false;
         private final String cornerLabelText;
+        private boolean isLogoAppearing = true, isLogoVanishing = false;
 
         public LogoFrame(String cornerLabelText) throws HeadlessException {
             this.cornerLabelText = cornerLabelText;
@@ -156,7 +166,6 @@ public class FoxLogo implements Runnable {
             inAc(this);
 
             setLocationRelativeTo(null);
-            setVisible(true);
         }
 
         @Override
@@ -227,10 +236,12 @@ public class FoxLogo implements Runnable {
         }
 
         private void drawImage(Graphics2D g2D, int imWidth, int imHeight) {
-            g2D.drawImage(images[picCounter],
-                    screen.width / 2 - imWidth / 2,
-                    screen.height / 2 - imHeight / 2,
-                    imWidth, imHeight, logoFrame);
+            if (images.length > picCounter) {
+                g2D.drawImage(images[picCounter],
+                        screen.width / 2 - imWidth / 2,
+                        screen.height / 2 - imHeight / 2,
+                        imWidth, imHeight, logoFrame);
+            }
         }
 
         private void gradeUp() {
@@ -254,8 +265,8 @@ public class FoxLogo implements Runnable {
         }
 
         private void inAc(JFrame logo) {
-            inputAction.add("logoFrame", logo);
-            inputAction.set("logoFrame", "final", breakKey, 0, new AbstractAction() {
+            inputAction.add("logoFrame", logo.getRootPane());
+            inputAction.set(JComponent.WHEN_FOCUSED, "logoFrame", "final", breakKey, 0, new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     finalLogo();

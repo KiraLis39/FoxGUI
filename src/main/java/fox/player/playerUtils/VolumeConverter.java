@@ -1,4 +1,4 @@
-package fox.player;
+package fox.player.playerUtils;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +46,7 @@ public class VolumeConverter {
 
     /**
      * Использовать ли новый, улучшенный расчет громкости
+     *
      * @param useBetterConvert переключатель условия.
      */
     public void setUseBetterConvert(boolean useBetterConvert) {

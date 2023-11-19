@@ -1,7 +1,8 @@
 package fox.components.tools;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ViewportLayout;
+import java.awt.Container;
+import java.awt.Dimension;
 
 public class ConstrainedViewPortLayout extends ViewportLayout {
     @Override

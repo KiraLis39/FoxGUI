@@ -2,17 +2,26 @@ package fox;
 
 import lombok.extern.slf4j.Slf4j;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JOptionPane;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 public class FoxFontBuilder {
@@ -104,6 +113,10 @@ public class FoxFontBuilder {
 
     public Rectangle2D getStringBounds(Graphics gr, String string) {
         return gr.getFontMetrics(gr.getFont()).getStringBounds(string, gr);
+    }
+
+    public double getHalfWidthOfString(Graphics gr, String string) {
+        return getStringBounds(gr, string).getWidth() / 2d;
     }
 
     public int addNewFont(String newFontName) {

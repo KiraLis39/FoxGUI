@@ -7,9 +7,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="FoxOut" />
-        <module name="FoxGUI" />
+        <module name="fox-gui" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="FoxGUI" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

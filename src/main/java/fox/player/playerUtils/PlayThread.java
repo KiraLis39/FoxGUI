@@ -1,9 +1,15 @@
-package fox.player;
+package fox.player.playerUtils;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.sound.sampled.*;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.BooleanControl;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.SourceDataLine;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -172,6 +178,7 @@ public class PlayThread extends Thread {
 
     /**
      * Set a volume gain.
+     *
      * @param gain - gain of current FloatControl.
      */
     public void setVolume(float gain) {
@@ -190,6 +197,7 @@ public class PlayThread extends Thread {
     /**
      * Использовать ли новый, экспериментальный функционал при воспроизведении.
      * К примеру - более качественный, но ещё не протестированный как следует формат аудио и т.п.
+     *
      * @param useExperimentalQualityFormat - переключатель экспериментального функционала.
      */
     public void setUseExperimentalQualityFormat(boolean useExperimentalQualityFormat) {

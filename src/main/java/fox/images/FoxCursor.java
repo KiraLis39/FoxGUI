@@ -3,8 +3,14 @@ package fox.images;
 import lombok.NonNull;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -12,39 +18,6 @@ import java.nio.file.Path;
 
 public final class FoxCursor {
     private FoxCursor() {
-    }
-
-    public static Cursor createCursor(@NonNull Path imagePath) throws IOException {
-        BufferedImage ico = ImageIO.read(imagePath.toFile());
-        if (ico == null) {
-            System.err.println("fox.games.FoxCursors (getCursor): Cursor " + imagePath + " has not found!");
-            return null;
-        }
-
-        try {
-            return Toolkit.getDefaultToolkit().createCustomCursor(ico, new Point(0, 0), imagePath.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static Cursor createCursor(@NonNull BufferedImage bImage, String name) {
-        try {
-            return Toolkit.getDefaultToolkit().createCustomCursor(bImage, new Point(0, 0), name);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static Cursor createCursor(@NonNull ImageIcon iImage, String name) {
-        try {
-            return Toolkit.getDefaultToolkit().createCustomCursor(iImage.getImage(), new Point(0, 0), name);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public static Cursor createCursor(@NonNull Icon ico, String curName) {
@@ -66,6 +39,34 @@ public final class FoxCursor {
             e.printStackTrace();
         }
 
+        return null;
+    }
+
+    public static Cursor createCursor(@NonNull Path imagePath) throws IOException {
+        BufferedImage ico = ImageIO.read(imagePath.toFile());
+        if (ico == null) {
+            System.err.println("fox.games.FoxCursors (getCursor): Cursor " + imagePath + " has not found!");
+            return null;
+        }
+
+        return createCursor(ico, imagePath.getFileName().toString());
+    }
+
+    public static Cursor createCursor(@NonNull BufferedImage bImage, String name) {
+        try {
+            return Toolkit.getDefaultToolkit().createCustomCursor(bImage, new Point(0, 0), name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Cursor createCursor(@NonNull ImageIcon iImage, String name) {
+        try {
+            return Toolkit.getDefaultToolkit().createCustomCursor(iImage.getImage(), new Point(0, 0), name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 }

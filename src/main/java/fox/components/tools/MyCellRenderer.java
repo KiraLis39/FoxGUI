@@ -1,7 +1,12 @@
 package fox.components.tools;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 
 public class MyCellRenderer extends JPanel implements ListCellRenderer<JButton> {
     private static int cellHeight;

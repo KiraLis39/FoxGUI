@@ -1,11 +1,16 @@
-package fox.render.foxLFui;
+package fox.render.fox_lfui;
 
 import fox.FoxRender;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JToolBar;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicToolBarUI;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.beans.PropertyChangeListener;
 
 public class MyToolBarUI extends BasicToolBarUI {
@@ -38,6 +43,7 @@ public class MyToolBarUI extends BasicToolBarUI {
         super.uninstallListeners();
         toolBar.removePropertyChangeListener(pcl);
     }
+
     @Override
     public void installUI(JComponent c) {
         // Обязательно оставляем установку UI, реализованную в Basic UI классе
@@ -49,6 +55,7 @@ public class MyToolBarUI extends BasicToolBarUI {
         toolBar.setFocusable(false);
         toolBar.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
     }
+
     @Override
     public void paint(Graphics g, JComponent c) {
         Graphics2D g2d = (Graphics2D) g;

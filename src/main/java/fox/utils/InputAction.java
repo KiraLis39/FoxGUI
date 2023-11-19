@@ -1,63 +1,61 @@
 package fox.utils;
 
-import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Arrays;
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-@Data
+@Slf4j
 public class InputAction {
     private final Map<String, JComponent> compMap = new LinkedHashMap<>();
-    private FOCUS_TYPE focusType = FOCUS_TYPE.WHEN_FOCUSED;
-
-    public void add(String name, Window window) {
-        add(name, (JComponent) window.getComponent(0));
-    }
 
     public void add(String name, JComponent comp) {
+        comp.setFocusable(true);
+        comp.setRequestFocusEnabled(true);
         compMap.put(name, comp);
     }
 
-    public void set(FOCUS_TYPE _focusType, String name, String commandName, int key, int mod, AbstractAction action) {
-        focusType = _focusType;
-        set(name, commandName, key, mod, action);
+    public void set(int jComponentFocusType, String name, String commandName, int key, int mod, AbstractAction action) {
+        set(jComponentFocusType, name, commandName, key, mod, false, action);
     }
 
-    public void set(String name, String commandName, int key, int mod, AbstractAction action) {
+    public void set(int jComponentFocusType, String name, String commandName, KeyStroke keyStroke, AbstractAction action) {
+        set(jComponentFocusType, name, commandName, keyStroke.getKeyCode(), keyStroke.getModifiers(), keyStroke.isOnKeyRelease(), action);
+    }
+
+    public void set(int jComponentFocusType, String name, String commandName, int key, int mod, boolean onRelease, AbstractAction action) {
         if (compMap.containsKey(name)) {
-            (compMap.get(name)).getInputMap(focusType.ordinal()).put(KeyStroke.getKeyStroke(key, mod), commandName);
+            (compMap.get(name)).getInputMap(jComponentFocusType).put(KeyStroke.getKeyStroke(key, mod, onRelease), commandName);
             (compMap.get(name)).getActionMap().put(commandName, action);
             return;
         }
 
-        throw new RuntimeException("InputAction: Error!\nMap of InputAction has not contents component '" + name + "'.");
+        log.error("InputAction: Map of InputAction has not contents component '{}'.", name);
     }
 
     public String list() {
-        return "InputAction: Content:\n" + Arrays.toString(compMap.keySet().toArray());
+        return "InputAction content: " + compMap.keySet();
     }
 
     public Set<Entry<String, JComponent>> getEntrySet() {
         return compMap.entrySet();
     }
 
-    public void remove(String componentName) throws Exception {
+    public void remove(String componentName) {
         if (compMap.containsKey(componentName)) {
             compMap.remove(componentName);
             return;
         }
 
-        throw new Exception("InputAction: Error!\nMap of InputAction has not contents component '" + componentName + "'.");
+        log.error("InputAction: Map of InputAction has not contents component '{}'.", componentName);
     }
 
     public void clearAll() {
         compMap.clear();
     }
-
-    public enum FOCUS_TYPE {WHEN_FOCUSED, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, WHEN_IN_FOCUSED_WINDOW}
 }

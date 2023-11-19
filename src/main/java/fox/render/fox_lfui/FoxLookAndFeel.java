@@ -1,6 +1,6 @@
-package fox.render.foxLFui;
+package fox.render.fox_lfui;
 
-import javax.swing.*;
+import javax.swing.UIDefaults;
 import javax.swing.plaf.basic.BasicLookAndFeel;
 
 
