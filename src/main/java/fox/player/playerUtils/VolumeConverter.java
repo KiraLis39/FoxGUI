@@ -1,15 +1,15 @@
 package fox.player.playerUtils;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-@Setter
-@Data
 @Slf4j
+@Setter
+@Getter
 public class VolumeConverter {
-    private static final float MIN = -80f;
-    private static final float MAX = 6f;
+    private static float MIN = -80f;
+    private static float MAX = 6f;
     /**
      * -- SETTER --
      * Использовать ли новый, улучшенный расчет громкости
@@ -56,5 +56,21 @@ public class VolumeConverter {
 
     public float getMaximum() {
         return MAX;
+    }
+
+    public void setMinimum(float min) {
+        if (min > 6) {
+            log.warn("Минимальная указанная громкость ({}) выше возможной максимальной (6), будет инвертирована на отрицательную.", min);
+            min = -min;
+        }
+        MIN = min;
+    }
+
+    public void setMaximum(float max) {
+        if (max > 6) {
+            log.warn("Максимальная указанная громкость ({}) выше возможной максимальной (6), будет ограничена ей.", max);
+            max = 6;
+        }
+        MAX = max;
     }
 }

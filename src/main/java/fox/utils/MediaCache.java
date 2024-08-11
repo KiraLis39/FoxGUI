@@ -225,6 +225,10 @@ public final class MediaCache {
 
     public enum DATA_TYPE {
         WAV(".wav"),
+        OGG(".ogg"),
+        MP3(".mp3"),
+        JPG(".jpg"),
+        GIF(".gif"),
         PNG(".png");
 
         private final String extension;

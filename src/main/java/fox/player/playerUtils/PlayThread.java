@@ -95,6 +95,7 @@ public class PlayThread extends Thread {
                             volumeFloater(1);
                         }
 
+                        dataIn.reset(); // чтобы сбросить на начало трека для повторов (if isLooped = true).
                         int nBytesRead;
                         while ((nBytesRead = dataIn.read(buffer, 0, buffer.length)) != -1) {
                             if (isBroken() || currentThread.isInterrupted() || isInterrupted()) {

@@ -4,7 +4,6 @@ import fox.player.interfaces.iPlayer;
 import fox.player.playerUtils.PlayThread;
 import fox.player.playerUtils.VolumeConverter;
 import fox.utils.MediaCache;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Data
 @Slf4j
 public final class FoxPlayer implements iPlayer {
     @Getter
@@ -29,6 +27,7 @@ public final class FoxPlayer implements iPlayer {
     private final String name;
     private String lastTrack;
 
+    @Getter
     private volatile int playerVolumePercent = 100;
     private volatile boolean isMuted = false, isLooped = false, isParallelPlayable = false;
 
@@ -89,7 +88,7 @@ public final class FoxPlayer implements iPlayer {
         }
 
         cleanThreads();
-        log.info("Player {} > Потоков аудио: {} ({})", name, playThreads.size(), playThreads.stream().map(Thread::getName).toList());
+        log.debug("Player {} > Потоков аудио: {} ({})", name, playThreads.size(), playThreads.stream().map(Thread::getName).toList());
     }
 
     private void cleanThreads() {
@@ -164,5 +163,13 @@ public final class FoxPlayer implements iPlayer {
         for (PlayThread playThread : playThreads) {
             playThread.setVolumeFlowEnabled(b);
         }
+    }
+
+    public void setParallelPlayable(boolean b) {
+        isParallelPlayable = b;
+    }
+
+    public boolean isMuted() {
+        return isMuted;
     }
 }
