@@ -7,21 +7,15 @@ public class FoxExperience {
     }
 
     /**
-     * XP убийство моба = 100 * (10 + LVL моба — LVL игрока) / (10 + LVL игрока).
-     * На первом уровне нужно убить 10 мобов своего уровня, на десятом — двадцать..
+     * Метод расчета экспириенса.
      *
-     * @return экспириенс, что должен получить игрок за уничтожение цели.
+     * @param playerLVL уровень игрока.
+     * @param aimLVL    уровень уничтожаемой цели.
+     * @param mod       модификатор опыта.
+     * @param space     допустимая разница в уровнях, когда может падать опыт.
+     * @return экспириенс, что должен получить player за уничтожение aim.
      */
-    public static double getExp(int playerLVL, int aimLVL) {
-        return 100D * (10D + aimLVL - playerLVL) / (10D + playerLVL);
-    }
-
-    /**
-     * Более гибкий метод рассчета экспириенса в отличие от {@link FoxExperience#getExp(int, int)}
-     *
-     * @return экспириенс, что должен получить игрок за уничтожение цели.
-     */
-    public static double getExp(float playerLVL, float aimLVL, float mod1, float mod2) {
-        return mod1 * (mod2 + aimLVL - playerLVL) / (mod2 + playerLVL);
+    public static double getExp(float playerLVL, float aimLVL, float mod, float space) {
+        return Math.max(0, mod * (space + aimLVL - playerLVL) / (space + playerLVL));
     }
 }

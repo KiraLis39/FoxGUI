@@ -50,7 +50,7 @@ public class FOptionPane extends JDialog implements ActionListener, MouseListene
     private final Color baseground = new Color(0.1f, 0.1f, 0.1f, 0.9f);
     private TYPE type;
     private JButton OK_BUTTON, NO_BUTTON, YES_BUTTON;
-    private int answer = -1;
+    private Object answer;
     private AtomicInteger timeout;
     private JLabel titleLabel;
     private JTextField inputField;
@@ -110,6 +110,7 @@ public class FOptionPane extends JDialog implements ActionListener, MouseListene
             setCursor(cursor);
         }
         setTitle(title);
+        setFocusable(false);
         setUndecorated(true);
         setBackground(baseground);
         setPreferredSize(new Dimension(300, 150));
@@ -122,6 +123,7 @@ public class FOptionPane extends JDialog implements ActionListener, MouseListene
         JPanel basePane = new JPanel(new BorderLayout(3, 3)) {
             {
                 setOpaque(false);
+                setFocusable(false);
 
                 upLabelPane = new JPanel(new BorderLayout(0, 0)) {
                     @Override
@@ -130,16 +132,20 @@ public class FOptionPane extends JDialog implements ActionListener, MouseListene
                         g.setColor(new Color(0.0f, 0.0f, 0.0f, 0.2f));
                         g.fillRect(0, 0, getWidth(), getHeight());
 
-                        g.setColor(Color.GRAY);
-                        g.drawString(timeLastLabel, (int) (getWidth() - fontBuilder.getStringBounds(g, timeLastLabel).getWidth()), 14);
+                        if (timeLastLabel != null) {
+                            g.setColor(Color.GRAY);
+                            g.drawString(timeLastLabel, (int) (getWidth() - fontBuilder.getStringBounds(g, timeLastLabel).getWidth()), 14);
+                        }
                     }
 
                     {
                         setOpaque(false);
+                        setFocusable(false);
                         setBorder(new EmptyBorder(0, 6, 3, 3));
 
                         titleLabel = new JLabel(getTitle()) {
                             {
+                                setFocusable(false);
                                 setForeground(Color.WHITE);
                                 setBackground(new Color(0, 0, 0, 0));
                             }
@@ -152,6 +158,7 @@ public class FOptionPane extends JDialog implements ActionListener, MouseListene
                 JPanel midContentPane = new JPanel(new BorderLayout(0, 0)) {
                     {
                         setOpaque(false);
+                        setFocusable(false);
                         setBorder(new EmptyBorder(3, 9, 0, 0));
 
                         JPanel icoPane = new JPanel(new BorderLayout(0, 0)) {
@@ -174,6 +181,7 @@ public class FOptionPane extends JDialog implements ActionListener, MouseListene
                             }
 
                             {
+                                setFocusable(false);
                                 setPreferredSize(new Dimension(64, 64));
                             }
                         };
@@ -181,18 +189,27 @@ public class FOptionPane extends JDialog implements ActionListener, MouseListene
                         JPanel mesPane = new JPanel(new BorderLayout(1, 1)) {
                             {
                                 setOpaque(false);
+                                setFocusable(false);
+                                setIgnoreRepaint(true);
+                                setDoubleBuffered(false);
                                 setBackground(baseground);
-                                setBorder(new EmptyBorder(16, 6, 0, 0));
+                                setBorder(new EmptyBorder(8, 4, 0, 2));
 
                                 if (type == TYPE.INPUT) {
                                     JPanel inputPane = new JPanel(new GridLayout(3, 1, 0, 0)) {
                                         {
                                             setOpaque(false);
+                                            setFocusable(false);
                                             setBorder(new EmptyBorder(0, 0, 0, 9));
 
-                                            inputField = new JTextField();
+                                            inputField = new JTextField() {{
+                                                setFocusable(true);
+                                                setRequestFocusEnabled(true);
+                                                setAutoRequestFocus(true);
+                                            }};
                                             add(new JLabel(message) {
                                                 {
+                                                    setFocusable(false);
                                                     setForeground(Color.WHITE);
                                                 }
                                             });
@@ -211,7 +228,7 @@ public class FOptionPane extends JDialog implements ActionListener, MouseListene
                                             setText(message);
                                             setWrapStyleWord(true);
                                             setLineWrap(true);
-                                            setBorder(new EmptyBorder(1, 4, 0, 0));
+                                            setBorder(new EmptyBorder(1, 6, 0, 0));
                                         }
                                     };
 
@@ -323,12 +340,15 @@ public class FOptionPane extends JDialog implements ActionListener, MouseListene
 
         new Thread(() -> {
             timeout = new AtomicInteger(_timeout == null ? 15 : Math.max(1, _timeout));
-            while (timeout.get() > 0) {
-                timeLastLabel = "Осталось: " + timeout + " сек.";
+
+            while (_timeout == null || timeout.get() > 0) {
+                if (_timeout != null && _timeout > 0) {
+                    timeLastLabel = "Осталось: " + timeout + " сек.";
+                }
                 upLabelPane.repaint();
                 try {
                     sleep(499);
-                    if (timeout.decrementAndGet() == 0) {
+                    if (_timeout != null && _timeout > 0 && timeout.decrementAndGet() == 0) {
                         break;
                     } else {
                         sleep(499);
@@ -342,6 +362,10 @@ public class FOptionPane extends JDialog implements ActionListener, MouseListene
             answer = -1;
             stop();
         }).start();
+
+        if (type == TYPE.INPUT) {
+            inputField.requestFocusInWindow();
+        }
 
         setAlwaysOnTop(true);
         setModal(isModal);
@@ -362,7 +386,7 @@ public class FOptionPane extends JDialog implements ActionListener, MouseListene
     }
 
     public void stop() {
-        log.info("Stop the FOption...");
+        log.debug("Stop the FOption...");
         timeout.set(0);
         setModal(false);
         setVisible(false);
@@ -380,10 +404,14 @@ public class FOptionPane extends JDialog implements ActionListener, MouseListene
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case "yes" -> answer = 0;
-            case "no" -> answer = 1;
-            default -> answer = -2;
+        if (type.equals(TYPE.INPUT)) {
+            answer = inputField.getText();
+        } else {
+            switch (e.getActionCommand()) {
+                case "yes" -> answer = 0;
+                case "no" -> answer = 1;
+                default -> answer = -2;
+            }
         }
 
         log.info("Dispose FOption with answer: {}", answer);
@@ -397,14 +425,16 @@ public class FOptionPane extends JDialog implements ActionListener, MouseListene
 
     @Override
     public void mousePressed(MouseEvent e) {
-//        p = MouseInfo.getPointerInfo().getLocation();
+        p = MouseInfo.getPointerInfo().getLocation();
         oldLocation = getLocation();
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
         Point newPoint = MouseInfo.getPointerInfo().getLocation();
-        setLocation(oldLocation.x + newPoint.x, newPoint.y + newPoint.y);
+        setLocation(
+                oldLocation.x - (p.x - newPoint.x),
+                oldLocation.y - (p.y - newPoint.y));
     }
 
     @Override

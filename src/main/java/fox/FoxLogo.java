@@ -3,6 +3,7 @@ package fox;
 import fox.utils.InputAction;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.AbstractAction;
@@ -10,6 +11,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
@@ -30,24 +32,31 @@ import java.util.concurrent.TimeUnit;
 public class FoxLogo implements Runnable {
     private final FoxRender foxRender = new FoxRender();
     private final InputAction inputAction = new InputAction();
+    private final Font customFont = new FoxFontBuilder().setFoxFont(FoxFontBuilder.FONT.CONSOLAS, 24, true);
+    private final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+
     private long timeStamp;
-    private Font customFont;
-    private Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
     private IMAGE_STYLE imStyle = IMAGE_STYLE.DEFAULT;
     private BACK_STYLE bStyle = BACK_STYLE.ASIS;
     private JFrame logoFrame;
     private Thread engine;
     private BufferedImage[] images;
-    private Color color;
+    private Color color = Color.BLACK;
     private Color logoBackColor;
-    private Raster raster;
     private int breakKey = KeyEvent.VK_ESCAPE;
     private int picCounter = -1;
     private int fps = 30;
-    private int imageShowTime = 5000;
+    /**
+     * -- SETTER --
+     *  Время "зависания" лого после появления на экране. Перед тем, как начнется анимация завершения (если она включена).
+     *
+     * @param imageShowTime новое время ожидания на экране (по умолчанию - 5_000 мс)
+     */
+    @Setter
+    private int imageShowTime = 4500;
     private float alphaGrad = 0f;
-    private boolean isBroken = false;
     private boolean highQualityMode = false;
+    private volatile boolean isBroken = false;
 
     public void start(String cornerLabelText, BufferedImage... textureFilesMassive) {
         start(cornerLabelText, imStyle, bStyle, breakKey, textureFilesMassive);
@@ -62,6 +71,7 @@ public class FoxLogo implements Runnable {
             log.error("Textures massive is can not be a NULL or empty");
             throw new NoSuchElementException("Textures massive is NULL or empty");
         }
+
         log.debug("Load StartLogo`s images count: {}", textureFilesMassive.length);
         images = textureFilesMassive;
 
@@ -82,28 +92,32 @@ public class FoxLogo implements Runnable {
         loadNextImage();
         logoFrame.setVisible(true);
         timeStamp = System.currentTimeMillis();
-        while (!isBroken && !engine.isInterrupted()) {
+
+        log.info("Start the logo-thread...");
+        while (!isBroken && !Thread.currentThread().isInterrupted()) {
             try {
                 logoFrame.repaint();
                 TimeUnit.MILLISECONDS.sleep(1000 / fps);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Ошибка при отрисовке лого: {}", e.getMessage(), e);
             }
         }
 
+        log.info("Try to final logo from run method...");
         finalLogo();
-        logoFrame.dispose();
     }
 
     private void loadNextImage() {
         picCounter++;
         if (picCounter >= images.length) {
-            isBroken = true;
+            log.info("Final logo by images length...");
+            this.isBroken = true;
         } else {
+            log.info("Load next logo image...");
             timeStamp = System.currentTimeMillis();
-            raster = images[picCounter].getRaster();
+            Raster raster = images[picCounter].getRaster();
             Object data = raster.getDataElements(1, images[picCounter].getHeight() / 2, null);
             logoBackColor = new Color(images[picCounter].getColorModel().getRGB(data), true);
             alphaGrad = 0;
@@ -111,40 +125,20 @@ public class FoxLogo implements Runnable {
     }
 
     public void finalLogo() {
-        isBroken = true;
-    }
-
-    public void join() throws InterruptedException {
-        if (engine != null && engine.isAlive()) {
-            engine.join();
+        this.isBroken = true;
+        if (logoFrame != null) {
+            logoFrame.dispose();
         }
     }
 
-    public int getLogoFps() {
-        return fps;
+    public void join(long jTime) throws InterruptedException {
+        if (engine != null && engine.isAlive()) {
+            engine.join(jTime);
+        }
     }
 
-    /**
-     * FPS или количество кадров на секунду, которое лого будет перерисовываться при анимации на экране.
-     * По умолчанию значение - 30
-     *
-     * @param fps новое значение кадров в секунду.
-     */
-    public void setLogoFps(int fps) {
-        this.fps = fps;
-    }
-
-    public int getImageShowTime() {
-        return imageShowTime;
-    }
-
-    /**
-     * Время "зависания" лого после появления на экране. Перед тем, как начнется анимация завершения (если она включена).
-     *
-     * @param imageShowTime новое время ожидания на экране (по умолчанию - 5_000 мс)
-     */
-    public void setImageShowTime(int imageShowTime) {
-        this.imageShowTime = imageShowTime;
+    public boolean isAlive() {
+        return engine != null && engine.isAlive();
     }
 
     public enum IMAGE_STYLE {FILL, DEFAULT, WRAP}
@@ -176,9 +170,11 @@ public class FoxLogo implements Runnable {
             super.paint(g);
 
             Graphics2D g2D = (Graphics2D) g;
-            foxRender.setRender(g2D, FoxRender.RENDER.MED);
+            foxRender.setRender(g2D, FoxRender.RENDER.MED, false, false);
 
-            if (isLogoAppearing) gradeUp();
+            if (isLogoAppearing) {
+                gradeUp();
+            }
 
             if (bStyle == BACK_STYLE.ASIS) {
                 g2D.setColor(logoBackColor);
@@ -187,8 +183,6 @@ public class FoxLogo implements Runnable {
                 g2D.setColor(color == null ? Color.MAGENTA : color);
                 g2D.fillRect(0, 0, getWidth(), getHeight());
             }
-
-            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaGrad));
 
             float imageWidth, imageHeight;
             if (imStyle == IMAGE_STYLE.WRAP) { // style is WRAP:
@@ -212,7 +206,11 @@ public class FoxLogo implements Runnable {
                 imageHeight = images[picCounter].getHeight();
             }
 
+            Composite comp = g2D.getComposite();
+            g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaGrad));
             drawImage(g2D, (int) imageWidth, (int) imageHeight);
+            g2D.setComposite(comp);
+
             drawText(g2D);
 
             g2D.dispose();
@@ -220,7 +218,7 @@ public class FoxLogo implements Runnable {
             if (System.currentTimeMillis() - timeStamp > imageShowTime && isLogoVanishing) {
                 gradeDown();
             }
-            if (alphaGrad == 0) {
+            if (alphaGrad <= 0.05f) {
                 loadNextImage();
             }
         }
@@ -245,33 +243,37 @@ public class FoxLogo implements Runnable {
         }
 
         private void gradeUp() {
-            if (alphaGrad > 0.94f) {
+            if (alphaGrad >= 0.925f) {
                 alphaGrad = 1f;
                 isLogoAppearing = false;
                 isLogoVanishing = true;
             } else {
-                alphaGrad += 0.05f;
+                alphaGrad += 0.075f;
             }
         }
 
         private void gradeDown() {
-            if (alphaGrad < 0.076f) {
+            if (alphaGrad <= 0.085f) {
                 alphaGrad = 0f;
                 isLogoAppearing = true;
                 isLogoVanishing = false;
             } else {
-                alphaGrad -= 0.075f;
+                alphaGrad -= 0.085f;
             }
         }
 
         private void inAc(JFrame logo) {
             inputAction.add("logoFrame", logo.getRootPane());
-            inputAction.set(JComponent.WHEN_FOCUSED, "logoFrame", "final", breakKey, 0, new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    finalLogo();
-                }
-            });
+            inputAction.set(JComponent.WHEN_IN_FOCUSED_WINDOW, "logoFrame", "final", breakKey, 0,
+                    new AbstractAction() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            alphaGrad = 0f;
+                            loadNextImage();
+//                    log.info("Try to final logo by breakKey...");
+//                    finalLogo();
+                        }
+                    });
         }
     }
 }

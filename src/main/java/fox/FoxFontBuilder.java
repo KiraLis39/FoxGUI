@@ -1,5 +1,6 @@
 package fox;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.JOptionPane;
@@ -59,7 +60,7 @@ public class FoxFontBuilder {
                         Files.createDirectory(fontsDirectory);
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("Ошибка при работе с директорией шрифтов '{}': {}", fontsDirectory, e.getMessage());
                 }
             } else {
                 // если в ОС нет шрифта, но указана папка c ним:
@@ -73,8 +74,8 @@ public class FoxFontBuilder {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    log.error("Error with font existing! Set fonts dir by methode:  setFontsDirectory(File fontsDirectory) where fontsDirectory is a folder with fonts from FoxLib jar archive.fonts");
+                    log.error("Error with font existing! Set fonts dir by methode: setFontsDirectory(File fontsDirectory) " +
+                            "where fontsDirectory is a folder with fonts from FoxLib jar archive.fonts: " + e.getMessage());
                     if (!Files.notExists(fontsDirectory)) {
                         log.warn("FAILED!");
                     } else {
@@ -99,7 +100,7 @@ public class FoxFontBuilder {
             }
         }
 
-        log.debug("Font '" + fArr.get(ID) + "' not exists in this OS! Please setup it if you can.");
+        log.debug("Font '{}' not exists in this OS! Please setup it if you can.", fArr.get(ID));
         return false;
     }
 
@@ -160,10 +161,6 @@ public class FoxFontBuilder {
                 "Ошибка!", JOptionPane.WARNING_MESSAGE);
     }
 
-    public Path getFontsDirectory() {
-        return fontsDirectory;
-    }
-
     public void setFontsDirectory(Path _fontsDirectory) {
         if (Files.notExists(Paths.get("./fonts/"))) {
             log.debug("The fonts path is not exist! (" + _fontsDirectory + ").");
@@ -202,6 +199,7 @@ public class FoxFontBuilder {
 //		Font font = Font.createFont(Font.TRUETYPE_FONT, new File("Fonts\\custom_font.ttf")).deriveFont(12f);
     }
 
+    @Getter
     public enum FONT {
         COMIC_SANS("Comic Sans MS"),
         MONOTYPE_CORSIVA("Monotype Corsiva"),
@@ -226,10 +224,6 @@ public class FoxFontBuilder {
 
         FONT(String value) {
             this.value = value;
-        }
-
-        public String getValue() {
-            return value;
         }
     }
 }
