@@ -1,5 +1,8 @@
 package fox.components.tools;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -35,24 +38,12 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
      */
     int align; // This is the one we actually use
 
-    /**
-     * The flow layout manager allows a seperation of fox.components with gaps. The
-     * horizontal gap will specify the space between fox.components and between the
-     * fox.components and the borders of the <code>Container</code>.
-     *
-     * @see #getHgap()
-     * @see #setHgap(int)
-     */
+    @Setter
+    @Getter
     int hgap;
 
-    /**
-     * The flow layout manager allows a seperation of fox.components with gaps. The
-     * vertical gap will specify the space between rows and between the the rows and
-     * the borders of the <code>Container</code>.
-     *
-     * @see #getHgap()
-     * @see #setHgap(int)
-     */
+    @Setter
+    @Getter
     int vgap;
 
     /**
@@ -123,57 +114,6 @@ public class VerticalFlowLayout implements LayoutManager, Serializable {
      */
     public void setAlignment(int align) {
         this.align = align;
-    }
-
-    /**
-     * Gets the horizontal gap between fox.components and between the fox.components and the
-     * borders of the <code>Container</code>
-     *
-     * @return the horizontal gap between fox.components and between the fox.components and
-     * the borders of the <code>Container</code>
-     * @see fox.components.tools.VerticalFlowLayout#setHgap
-     * @since JDK1.1
-     */
-    public int getHgap() {
-        return hgap;
-    }
-
-    /**
-     * Sets the horizontal gap between fox.components and between the fox.components and the
-     * borders of the <code>Container</code>.
-     *
-     * @param hgap the horizontal gap between fox.components and between the fox.components
-     *             and the borders of the <code>Container</code>
-     * @see fox.components.tools.VerticalFlowLayout#getHgap
-     * @since JDK1.1
-     */
-    public void setHgap(int hgap) {
-        this.hgap = hgap;
-    }
-
-    /**
-     * Gets the vertical gap between fox.components and between the fox.components and the
-     * borders of the <code>Container</code>.
-     *
-     * @return the vertical gap between fox.components and between the fox.components and
-     * the borders of the <code>Container</code>
-     * @see fox.components.tools.VerticalFlowLayout#setVgap
-     * @since JDK1.1
-     */
-    public int getVgap() {
-        return vgap;
-    }
-
-    /**
-     * Sets the vertical gap between fox.components and between the fox.components and the
-     * borders of the <code>Container</code>.
-     *
-     * @param vgap the vertical gap between fox.components and between the fox.components
-     *             and the borders of the <code>Container</code>
-     * @see fox.components.tools.VerticalFlowLayout#getVgap
-     */
-    public void setVgap(int vgap) {
-        this.vgap = vgap;
     }
 
     /**

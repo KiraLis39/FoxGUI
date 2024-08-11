@@ -1,6 +1,7 @@
 package fox.images;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
@@ -15,7 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 
-
+@Slf4j
 public final class FoxCursor {
     private FoxCursor() {
     }
@@ -36,7 +37,7 @@ public final class FoxCursor {
 
             return createCursor(tmp, curName);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Ошибка создания курсора: {}", e.getMessage());
         }
 
         return null;
@@ -56,7 +57,7 @@ public final class FoxCursor {
         try {
             return Toolkit.getDefaultToolkit().createCustomCursor(bImage, new Point(0, 0), name);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Ошибка создания курсора: {}", e.getMessage());
         }
         return null;
     }
@@ -65,7 +66,7 @@ public final class FoxCursor {
         try {
             return Toolkit.getDefaultToolkit().createCustomCursor(iImage.getImage(), new Point(0, 0), name);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Ошибка создания курсора: {}", e.getMessage());
         }
         return null;
     }

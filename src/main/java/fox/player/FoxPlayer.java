@@ -41,6 +41,7 @@ public class FoxPlayer implements iPlayer {
         if (files == null || files.length == 0) {
             log.warn("Media directory {} is empty?", audioDirectoryPath.toFile().getPath());
         }
+        assert files != null;
         Arrays.stream(files).forEach(file -> add(file.getName().substring(0, file.getName().length() - 4), file));
     }
 
@@ -122,7 +123,7 @@ public class FoxPlayer implements iPlayer {
             }
             thread.close();
             if (thread.getException() != null) {
-                thread.getException().printStackTrace();
+                log.error("Error here: " + thread.getException());
             }
         }
         playThreads.clear();

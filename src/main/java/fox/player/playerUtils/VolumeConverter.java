@@ -1,13 +1,19 @@
 package fox.player.playerUtils;
 
 import lombok.Data;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+@Setter
 @Data
 @Slf4j
 public class VolumeConverter {
     private static final float MIN = -80f;
     private static final float MAX = 6f;
+    /**
+     * -- SETTER --
+     *  Использовать ли новый, улучшенный расчет громкости
+     */
     private boolean useBetterConvert = true;
 
     /**
@@ -42,15 +48,6 @@ public class VolumeConverter {
         float cor = Math.abs(MIN) + Math.abs(MAX);
         float del = cor / 100f;
         return Math.round((gain - MIN) / del);
-    }
-
-    /**
-     * Использовать ли новый, улучшенный расчет громкости
-     *
-     * @param useBetterConvert переключатель условия.
-     */
-    public void setUseBetterConvert(boolean useBetterConvert) {
-        this.useBetterConvert = useBetterConvert;
     }
 
     public float getMinimum() {

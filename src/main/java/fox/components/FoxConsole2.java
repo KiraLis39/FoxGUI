@@ -168,10 +168,6 @@ public class FoxConsole2 extends JDialog implements KeyListener {
                         inputArea.grabFocus();
                         oClock.setText(dateFormat.format(System.currentTimeMillis()));
                     }
-
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-                    }
                 });
             }
         };

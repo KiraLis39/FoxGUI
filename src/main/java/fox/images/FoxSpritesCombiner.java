@@ -19,8 +19,8 @@ public final class FoxSpritesCombiner {
         }
 
         int iter = 0;
-        double tileWidth = bImage.getWidth() / columns * 1d;
-        double tileHeight = bImage.getHeight() / rows * 1d;
+        double tileWidth = (double) bImage.getWidth() / columns;
+        double tileHeight = (double) bImage.getHeight() / rows;
         int tilesCountExpected = rows * columns;
         BufferedImage[] result = new BufferedImage[tilesCountExpected];
         for (int row = 0; row < rows; row++) {

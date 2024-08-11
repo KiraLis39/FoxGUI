@@ -2,6 +2,7 @@ package fox.components;
 
 import fox.utils.InputAction;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.AbstractAction;
@@ -39,6 +40,8 @@ public class FoxConsole extends JDialog {
     private JTextField inputArea;
     private JLabel oClock;
     private Font f0, f1, f2;
+
+    @Setter
     private boolean clockIsOn = false;
 
     public void buildFoxConsole(JFrame parent) {
@@ -261,9 +264,5 @@ public class FoxConsole extends JDialog {
 
     public void setInputAreaFont(Font f2) {
         this.f2 = f2;
-    }
-
-    public void setClockIsOn(boolean clockIsOn) {
-        this.clockIsOn = clockIsOn;
     }
 }
