@@ -1,7 +1,10 @@
 package fox.player.playerUtils;
 
+import fox.player.FoxPlayer;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -9,33 +12,48 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.BooleanControl;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.SourceDataLine;
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-
-import static fox.player.FoxPlayer.getVolumeConverter;
 
 @Slf4j
 public class PlayThread extends Thread {
-    private static final int audioBufDim = 8192; // default 4096
+    private static final int audioBufDim = 4096; // (default 4096) 8192
     private final Thread currentThread;
     private final File track;
+    private final AudioInputStream ais;
     private final boolean isLooped;
     private final float volume;
     private Thread vfThread;
-    private FloatControl masterVolume;
+    private FloatControl masterVolumeControl;
     private BooleanControl muteControl;
+    private LineEvent lineEvent;
     private Exception ex;
     private volatile boolean isBroken = false;
+
+    @Setter
+    private volatile boolean isVolumeFlowEnabled = false;
     private volatile boolean isLoopFloatedAlready = false;
+
+    @Setter
     private boolean useExperimentalQualityFormat = false;
+
+    @Setter
     private boolean useUnsignedFormat = false;
 
-    public PlayThread(@NonNull String name, File track, float volume, boolean isLooped) {
+    public PlayThread(@NonNull String name, @NonNull AudioInputStream ais, float volume, boolean isLooped) {
+        this(name, null, ais, volume, isLooped);
+    }
+
+    public PlayThread(@NonNull String name, @NonNull File track, float volume, boolean isLooped) {
+        this(name, track, null, volume, isLooped);
+    }
+
+    private PlayThread(@NonNull String name, @Nullable File track, @Nullable AudioInputStream ais, float volume, boolean isLooped) {
         setName(name);
         currentThread = this;
 
+        this.ais = ais;
         this.track = track;
         this.volume = volume;
         this.isLooped = isLooped;
@@ -45,15 +63,14 @@ public class PlayThread extends Thread {
 
     @Override
     public void run() {
-        log.debug("FoxPlayer.play: The '" + track.getName() + "' is played...");
+        log.debug("FoxPlayer.play: The '" + (track != null ? track.getName() : "audio stream") + "' is played...");
 
         SourceDataLine line = null;
         do {
-            try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(track)); // default 8192 byte
-                 AudioInputStream in = AudioSystem.getAudioInputStream(bis)
-            ) {
+            try (AudioInputStream in = (ais == null && track != null ? AudioSystem.getAudioInputStream(track) : ais)) {
                 if (in == null) {
-                    throw new NullPointerException("The track '" + track.getName() + "' has problem with input stream?..");
+                    throw new NullPointerException(
+                            "The track '" + (track != null ? track.getName() : "audio stream") + "' has problem with input stream?..");
                 }
 
                 AudioFormat targetFormat = useExperimentalQualityFormat ?
@@ -68,12 +85,13 @@ public class PlayThread extends Thread {
                     } else {
                         line.open();
                     }
-                    getControls(line, masterVolume == null ? volume : masterVolume.getValue());
+
+                    buildControls(line, masterVolumeControl != null ? masterVolumeControl.getValue() : volume);
                     line.start();
 
                     byte[] buffer = new byte[audioBufDim];
                     if (!isBroken && !currentThread.isInterrupted() && !isInterrupted()) {
-                        if (!isLoopFloatedAlready) {
+                        if (isVolumeFlowEnabled && !isLoopFloatedAlready) {
                             volumeFloater(1);
                         }
 
@@ -98,12 +116,19 @@ public class PlayThread extends Thread {
                 currentThread.interrupt();
             } finally {
                 if (line != null) {
-//                    line.drain();
-                    line.stop();
-                    line.close();
+                    stop(line);
                 }
             }
         } while (isLooped && !isInterrupted());
+    }
+
+    private void stop(SourceDataLine line) {
+        line.drain();
+        line.close();
+    }
+
+    private void pause(SourceDataLine line) {
+        line.stop(); // на самом деле это пауза...
     }
 
     private void volumeFloater(int vector) {
@@ -113,31 +138,33 @@ public class PlayThread extends Thread {
         float vfStep = 0.25f;
         float aimVolume;
         if (vector == 1) {
-            aimVolume = masterVolume.getValue();
+            aimVolume = masterVolumeControl.getValue();
         } else {
-            aimVolume = getVolumeConverter().getMinimum();
+            aimVolume = FoxPlayer.getVolumeConverter().getMinimum();
         }
 
         vfThread = new Thread(() -> {
+            isLoopFloatedAlready = false;
+
             // setDaemon(true);
             if (vector == 1) {
                 // set half of the gain volume for start:
-                masterVolume.setValue(getVolumeConverter().getMinimum() / 2);
+                masterVolumeControl.setValue(FoxPlayer.getVolumeConverter().getMinimum() / 2);
             }
 
             try {
                 if (vector == 1) {
-                    while (masterVolume.getValue() < aimVolume - 1) {
-                        masterVolume.setValue(masterVolume.getValue() + vfStep);
+                    while (masterVolumeControl.getValue() < aimVolume - 1) {
+                        masterVolumeControl.setValue(masterVolumeControl.getValue() + vfStep);
                         sleep(50);
                     }
-                    masterVolume.setValue(aimVolume);
+                    masterVolumeControl.setValue(aimVolume);
                 } else {
-                    while (masterVolume.getValue() > aimVolume + 1) {
-                        masterVolume.setValue(masterVolume.getValue() - vfStep);
+                    while (masterVolumeControl.getValue() > aimVolume + 1) {
+                        masterVolumeControl.setValue(masterVolumeControl.getValue() - vfStep);
                         sleep(20);
                     }
-                    masterVolume.setValue(aimVolume);
+                    masterVolumeControl.setValue(aimVolume);
                 }
             } catch (InterruptedException e) {
                 log.debug("Volume float thread exception: {}", e.getMessage());
@@ -156,7 +183,9 @@ public class PlayThread extends Thread {
     public void close() {
         new Thread(() -> {
             try {
-                volumeFloater(0);
+                if (isVolumeFlowEnabled) {
+                    volumeFloater(0);
+                }
                 vfThread.join();
                 isBroken = true;
                 interrupt();
@@ -182,30 +211,20 @@ public class PlayThread extends Thread {
      * @param gain - gain of current FloatControl.
      */
     public void setVolume(float gain) {
-        log.debug("Setting up the volume from {} to {}", masterVolume.getValue(), gain);
-        masterVolume.setValue(gain);
+        log.debug("Setting up the volume from {} to {}", masterVolumeControl.getValue(), gain);
+        masterVolumeControl.setValue(gain);
     }
 
-    private void getControls(SourceDataLine line, float volume) {
+    private void buildControls(SourceDataLine line, float volume) {
         muteControl = (BooleanControl) line.getControl(BooleanControl.Type.MUTE);
         muteControl.setValue(false);
 
-        masterVolume = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
-        masterVolume.setValue(volume);
-    }
+        masterVolumeControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+        masterVolumeControl.setValue(volume);
 
-    /**
-     * Использовать ли новый, экспериментальный функционал при воспроизведении.
-     * К примеру - более качественный, но ещё не протестированный как следует формат аудио и т.п.
-     *
-     * @param useExperimentalQualityFormat - переключатель экспериментального функционала.
-     */
-    public void setUseExperimentalQualityFormat(boolean useExperimentalQualityFormat) {
-        this.useExperimentalQualityFormat = useExperimentalQualityFormat;
-    }
+        lineEvent = new LineEvent(line, LineEvent.Type.OPEN, 0);
 
-    public void setUseUnsignedFormat(boolean useUnsignedFormat) {
-        this.useUnsignedFormat = useUnsignedFormat;
+        log.debug("Создан masterVolumeControl с громкостью {}", masterVolumeControl.getValue());
     }
 
     private static class DefaultFormat16 extends AudioFormat {

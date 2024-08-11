@@ -12,7 +12,7 @@ public class VolumeConverter {
     private static final float MAX = 6f;
     /**
      * -- SETTER --
-     *  Использовать ли новый, улучшенный расчет громкости
+     * Использовать ли новый, улучшенный расчет громкости
      */
     private boolean useBetterConvert = true;
 

@@ -3,7 +3,9 @@ package fox.player;
 import fox.player.interfaces.iPlayer;
 import fox.player.playerUtils.PlayThread;
 import fox.player.playerUtils.VolumeConverter;
+import fox.utils.MediaCache;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,23 +19,21 @@ import java.util.Map;
 
 @Data
 @Slf4j
-public class FoxPlayer implements iPlayer {
-    private static final LinkedHashMap<String, File> trackMap = new LinkedHashMap<>();
-    private static final VolumeConverter vConv = new VolumeConverter();
+public final class FoxPlayer implements iPlayer {
+    @Getter
+    private static final VolumeConverter volumeConverter = new VolumeConverter();
+    private static final MediaCache cache = new MediaCache().getInstance();
+
+    private final LinkedHashMap<String, File> trackMap = new LinkedHashMap<>();
     private final ArrayList<PlayThread> playThreads = new ArrayList<>();
     private final String name;
-    private volatile int currentPlayerVolumePercent = 0;
-    private volatile boolean isMuted = false;
-    private volatile boolean isLooped = true;
-    private volatile boolean isParallelPlayable = false;
     private String lastTrack;
+
+    private volatile int playerVolumePercent = 100;
+    private volatile boolean isMuted = false, isLooped = false, isParallelPlayable = false;
 
     public FoxPlayer(@NonNull String name) {
         this.name = name;
-    }
-
-    public static VolumeConverter getVolumeConverter() {
-        return vConv;
     }
 
     public synchronized void loadFromPath(@NonNull Path audioDirectoryPath) {
@@ -51,11 +51,11 @@ public class FoxPlayer implements iPlayer {
     }
 
     public void play(@NonNull String trackName) {
-        play(trackName, currentPlayerVolumePercent, isLooped);
+        play(trackName, playerVolumePercent, isLooped);
     }
 
     public void play(@NonNull String trackName, boolean isLooped) {
-        play(trackName, currentPlayerVolumePercent, isLooped);
+        play(trackName, playerVolumePercent, isLooped);
     }
 
     public void play(@NonNull String trackName, int volumePercent) {
@@ -70,15 +70,30 @@ public class FoxPlayer implements iPlayer {
         }
 
         if (trackMap.containsKey(trackName)) {
-            log.debug("The track '" + trackName + "' was found in the trackMap.");
+            log.debug("The track '" + trackName + "' was found in the local track map.");
             if (!isParallelPlayable) {
                 stop();
             }
-            playThreads.add(new PlayThread(this.name, trackMap.get(trackName), vConv.volumePercentToGain(volumePercent), isLooped));
+            playThreads.add(new PlayThread(
+                    this.name, trackMap.get(trackName), volumeConverter.volumePercentToGain(volumePercent), isLooped));
+        } else if (cache.hasKey(trackName)) {
+            log.debug("The track '" + trackName + "' was found in the media cache.");
+            if (!isParallelPlayable) {
+                stop();
+            }
+            playThreads.add(new PlayThread(this.name + "_" + trackName,
+                    cache.getAudioStream(trackName), volumeConverter.volumePercentToGain(volumePercent), isLooped));
         } else {
             stop();
             log.warn("The track '" + trackName + "' is absent in the trackMap.");
         }
+
+        cleanThreads();
+        log.info("Player {} > Потоков аудио: {} ({})", name, playThreads.size(), playThreads.stream().map(Thread::getName).toList());
+    }
+
+    private void cleanThreads() {
+        playThreads.removeIf(pt -> pt == null || !pt.isAlive() || pt.isInterrupted());
     }
 
     public synchronized void playNext() {
@@ -96,7 +111,7 @@ public class FoxPlayer implements iPlayer {
             }
         }
 
-        play(nextTrackName, currentPlayerVolumePercent, isLooped);
+        play(nextTrackName, playerVolumePercent, isLooped);
     }
 
     @Override
@@ -109,9 +124,9 @@ public class FoxPlayer implements iPlayer {
 
     @Override
     public void setGlobalVolumePercent(int volume) {
-        currentPlayerVolumePercent = volume;
+        playerVolumePercent = volume;
         for (PlayThread playThread : playThreads) {
-            playThread.setVolume(vConv.volumePercentToGain(currentPlayerVolumePercent));
+            playThread.setVolume(volumeConverter.volumePercentToGain(playerVolumePercent));
         }
     }
 
@@ -142,6 +157,12 @@ public class FoxPlayer implements iPlayer {
     public void setUseUnsignedFormat(boolean b) {
         for (PlayThread playThread : playThreads) {
             playThread.setUseUnsignedFormat(b);
+        }
+    }
+
+    public void setVolumeFlowEnabled(boolean b) {
+        for (PlayThread playThread : playThreads) {
+            playThread.setVolumeFlowEnabled(b);
         }
     }
 }

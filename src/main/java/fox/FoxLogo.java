@@ -46,12 +46,7 @@ public class FoxLogo implements Runnable {
     private int breakKey = KeyEvent.VK_ESCAPE;
     private int picCounter = -1;
     private int fps = 30;
-    /**
-     * -- SETTER --
-     *  Время "зависания" лого после появления на экране. Перед тем, как начнется анимация завершения (если она включена).
-     *
-     * @param imageShowTime новое время ожидания на экране (по умолчанию - 5_000 мс)
-     */
+
     @Setter
     private int imageShowTime = 4500;
     private float alphaGrad = 0f;

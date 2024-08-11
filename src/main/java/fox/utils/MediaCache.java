@@ -59,7 +59,6 @@ public final class MediaCache {
                 throw new RuntimeException(e);
             }
         }
-
         return null;
     }
 
